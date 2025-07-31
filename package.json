@@ -1,13 +1,12 @@
 {
-  "name": "travel-agency",
+  "name": "the-ace-independence-day-website",
   "version": "1.0.0",
   "private": true,
-  "dependencies": {
-    "parcel-bundler": "^1.6.1",
-    "next": "^12.1.10",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+  "description": "The ACE Independence Day Event Website",
+  "scripts": {
+    "dev": "echo 'Static site - serve with any HTTP server'",
+    "deploy": "wrangler deploy"
   },
-  "scripts": {},
-  "devDependencies": {}
+  "devDependencies": {},
+  "dependencies": {}
 }
