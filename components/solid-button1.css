@@ -1,0 +1,11 @@
+.solid-button1-container {
+  display: flex;
+  position: relative;
+}
+ 
+.solid-button1-button {
+  color: var(--dl-color-gray-white);
+  border: none;
+  border-radius: 50px;
+  background-color: var(--dl-color-primary-100);
+}
