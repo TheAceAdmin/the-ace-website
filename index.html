@@ -597,7 +597,7 @@
                         <span>Near KF Office</span>
                         <br />
                         <span class="landing-page-text33">Time:</span>
-                        <span>10 AM</span>
+                        <span>8.30 AM</span>
                       </span>
                     </fragment>
                   </span>
@@ -635,10 +635,12 @@
                   </span>
                   <outline-button-wrapper class="outline-button-wrapper">
                     <!--OutlineButton component-->
-                    <div class="outline-button-container">
-                      <button class="outline-button-button Button button">
-                        <span>Enroll</span>
-                      </button>
+                      <div class="outline-button-container">
+                        <a href="https://wa.me/9176848000?text=Hi, I would like to join Men's Cricket">
+                          <button class="outline-button-button Button button">
+                            <span>Enroll</span>
+                          </button>
+                        </a>
                     </div>
                   </outline-button-wrapper>
                 </div>
@@ -676,9 +678,11 @@
                   <outline-button-wrapper class="outline-button-wrapper">
                     <!--OutlineButton component-->
                     <div class="outline-button-container">
+                      <a href="https://wa.me/8220142575?text=Hi, I would like to join Women's Throwball">
                       <button class="outline-button-button Button button">
                         <span>Enroll</span>
                       </button>
+                      </a>
                     </div>
                   </outline-button-wrapper>
                 </div>
@@ -901,6 +905,18 @@
               </div>
             </sports-wrapper>
           </div>
+          
+          <!-- Additional Ideas and Activities Section -->
+          <div style="text-align: center; margin: 60px 0 40px 0;">
+            <h2 style="color: #000080; margin-bottom: 20px; font-size: 24px;">Have an Idea for Additional Activity?</h2>
+            <p style="color: #333; margin-bottom: 25px; font-size: 16px; line-height: 1.6;">
+              We welcome your suggestion for additional activity like yoga session, cultural performance, 
+              special feature, or any other idea to make our Independence Day celebration even more memorable!
+            </p>
+            <button onclick="openIdeasModal()" class="outline-button-button Button button" style="padding: 12px 30px; font-size: 16px; font-weight: 600;">
+              <span>Submit Your Idea</span>
+            </button>
+          </div>
         </div>
         <div class="landing-page-footer">
           <div class="landing-page-menu">
@@ -1055,6 +1071,42 @@
       </div>
     </div>
     
+    <!-- Ideas and Activities Modal -->
+    <div id="ideasModal" class="modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2>Submit Your Ideas & Activities</h2>
+          <span class="close" onclick="closeIdeasModal()">&times;</span>
+        </div>
+        <div class="modal-body">
+          <p class="modal-description">Share your suggestions for additional activities like yoga, cultural performances, or special features to enhance our Independence Day celebration!</p>
+          <form id="ideasModalForm" class="modal-rsvp-form" onsubmit="submitIdeasModal(event)">
+            <div class="modal-form-group">
+              <label for="ideasFlatNo">Flat No *</label>
+              <input type="text" id="ideasFlatNo" name="flatno" placeholder="Flat No *" required class="modal-form-input" style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase()">
+            </div>
+            <div class="modal-form-group">
+              <label for="ideasActivity">Activity/Idea *</label>
+              <textarea id="ideasActivity" name="activity" placeholder="Describe your activity or idea (e.g., Yoga session, Cultural dance, Special performance, etc.)" required class="modal-form-input" rows="4" style="resize: vertical;"></textarea>
+            </div>
+            <div class="modal-form-group">
+              <label for="ideasPhone">Phone *</label>
+              <input type="tel" id="ideasPhone" name="phone" placeholder="Phone *" required class="modal-form-input">
+            </div>
+            <div class="modal-form-group">
+              <label for="ideasName">Name *</label>
+              <input type="text" id="ideasName" name="name" placeholder="Name *" required class="modal-form-input">
+            </div>
+            <div class="modal-form-actions">
+              <button type="submit" class="modal-submit-button">
+                <span>Submit Ideas</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+    
     <script>
       // Show RSVP modal on scroll (only if not submitted before)
       let rsvpShown = false;
@@ -1095,6 +1147,7 @@
         const kidsModal = document.getElementById('kidsModal');
         const residentModal = document.getElementById('residentModal');
         const stallsModal = document.getElementById('stallsModal');
+        const ideasModal = document.getElementById('ideasModal');
         
         if (event.target === rsvpModal) {
           closeRSVPModal();
@@ -1110,6 +1163,10 @@
         
         if (event.target === stallsModal) {
           closeStallsModal();
+        }
+        
+        if (event.target === ideasModal) {
+          closeIdeasModal();
         }
       }
       
@@ -1129,18 +1186,97 @@
         // Store RSVP submission status in localStorage
         localStorage.setItem('rsvpSubmitted', 'true');
         
-        // Construct the Zoho form URL with parameters
-        const baseUrl = 'https://forms.zohopublic.in/theaceapartments1/form/IndependenceDayavailability/formperma/L37AV4WAU5YT3qwM3vKK0kpzr149-4YnkZ9NzxZUhDY';
-        const url = `${baseUrl}?flatno=${encodeURIComponent(flatNo)}&persons=${encodeURIComponent(persons)}&availability=${encodeURIComponent(availability)}`;
+        // Create hidden form for submission
+        const hiddenForm = document.createElement('form');
+        hiddenForm.method = 'POST';
+        hiddenForm.action = 'https://docs.google.com/forms/d/e/1FAIpQLSeyryr7Ri66VVv79wlpZZBcBMIIYqrbiaBuinTi_iNHYTDj2g/formResponse';
+        hiddenForm.target = 'hidden-iframe-rsvp';
+        hiddenForm.style.display = 'none';
         
-        // Open the Zoho form in a new tab with the pre-filled data
-        window.open(url, '_blank');
+        // Add form fields
+        const fields = [
+          { name: 'entry.1481232661', value: flatNo },
+          { name: 'entry.1552579916', value: persons },
+          { name: 'entry.982127940', value: availability },
+          { name: 'submit', value: 'Submit' }
+        ];
         
-        // Close the modal
-        closeRSVPModal();
+        fields.forEach(field => {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = field.name;
+          input.value = field.value;
+          hiddenForm.appendChild(input);
+        });
         
-        // Optional: Show success message
-        alert('Redirecting to RSVP form...');
+        // Create hidden iframe
+        const iframe = document.createElement('iframe');
+        iframe.name = 'hidden-iframe-rsvp';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+        document.body.appendChild(hiddenForm);
+        
+        // Submit form using native submit method
+        const submitButton = document.createElement('input');
+        submitButton.type = 'submit';
+        submitButton.style.display = 'none';
+        hiddenForm.appendChild(submitButton);
+        submitButton.click();
+        
+        // Clean up after submission
+        setTimeout(() => {
+          if (document.body.contains(hiddenForm)) {
+            document.body.removeChild(hiddenForm);
+          }
+          if (document.body.contains(iframe)) {
+            document.body.removeChild(iframe);
+          }
+        }, 2000);
+        
+        // Show success message in the modal
+        const modalBody = document.querySelector('#rsvpModal .modal-body');
+        modalBody.innerHTML = `
+          <div style="text-align: center; padding: 40px 20px;">
+            <div style="color: #28a745; font-size: 48px; margin-bottom: 20px;">✓</div>
+            <h3 style="color: #28a745; margin-bottom: 15px;">Submitted Successfully!</h3>
+            <p style="color: #666; font-size: 16px;">Your RSVP has been submitted successfully.</p>
+          </div>
+        `;
+        
+        // Close modal after 2 seconds
+        setTimeout(() => {
+          closeRSVPModal();
+          // Reset modal content for next use
+          setTimeout(() => {
+            modalBody.innerHTML = `
+              <p class="modal-description">Provide your availability to plan the event at its best</p>
+              <form id="modalRsvpForm" class="modal-rsvp-form" onsubmit="submitModalRSVP(event)">
+                <div class="modal-form-group">
+                  <label for="modalFlatNo">Flat No *</label>
+                  <input type="text" id="modalFlatNo" name="flatno" placeholder="Flat No *" required class="modal-form-input" style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase()">
+                </div>
+                <div class="modal-form-group">
+                  <label for="modalPersons">Persons</label>
+                  <input type="number" id="modalPersons" name="persons" placeholder="Persons" min="1" class="modal-form-input">
+                </div>
+                <div class="modal-form-group">
+                  <label for="modalAvailability">Availability *</label>
+                  <select id="modalAvailability" name="availability" required class="modal-form-input">
+                    <option value="">Select availability</option>
+                    <option value="Available">Available</option>
+                    <option value="Not Available">Not Available</option>
+                    <option value="Tentative">Tentative</option>
+                  </select>
+                </div>
+                <div class="modal-form-actions">
+                  <button type="submit" class="modal-submit-button">
+                    <span>Submit RSVP</span>
+                  </button>
+                </div>
+              </form>
+            `;
+          }, 500);
+        }, 2000);
       }
       
       function openKidsModal() {
@@ -1172,18 +1308,91 @@
         const childName = formData.get('childname');
         const age = formData.get('ag');
         
-        // Construct the Google Forms URL with parameters
-        const baseUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSehlzohBowDkQbNMZwgutnmg8QTrtJpOxzVcccZL6sxCMftwg/viewform?usp=pp_url';
-        const url = `${baseUrl}&entry.1334472200=${encodeURIComponent(flatNo)}&entry.675098627=${encodeURIComponent(childName)}&entry.418234604=${encodeURIComponent(age)}`;
+        // Create hidden form for submission
+        const hiddenForm = document.createElement('form');
+        hiddenForm.method = 'POST';
+        hiddenForm.action = 'https://docs.google.com/forms/d/e/1FAIpQLSehlzohBowDkQbNMZwgutnmg8QTrtJpOxzVcccZL6sxCMftwg/formResponse';
+        hiddenForm.target = 'hidden-iframe';
+        hiddenForm.style.display = 'none';
         
-        // Open the Google form in a new tab with the pre-filled data
-        window.open(url, '_blank');
+        // Add form fields
+        const fields = [
+          { name: 'entry.1334472200', value: flatNo },
+          { name: 'entry.675098627', value: childName },
+          { name: 'entry.418234604', value: age },
+          { name: 'submit', value: 'Submit' }
+        ];
         
-        // Close the modal
-        closeKidsModal();
+        fields.forEach(field => {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = field.name;
+          input.value = field.value;
+          hiddenForm.appendChild(input);
+        });
         
-        // Optional: Show success message
-        alert('Redirecting to Kids Activities form...');
+        // Create hidden iframe
+        const iframe = document.createElement('iframe');
+        iframe.name = 'hidden-iframe';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+        document.body.appendChild(hiddenForm);
+        
+        // Submit form using native submit method
+        const submitButton = document.createElement('input');
+        submitButton.type = 'submit';
+        submitButton.style.display = 'none';
+        hiddenForm.appendChild(submitButton);
+        submitButton.click();
+        
+        // Clean up after submission
+        setTimeout(() => {
+          if (document.body.contains(hiddenForm)) {
+            document.body.removeChild(hiddenForm);
+          }
+          if (document.body.contains(iframe)) {
+            document.body.removeChild(iframe);
+          }
+        }, 2000);
+        
+        // Show success message in the modal
+        const modalBody = document.querySelector('#kidsModal .modal-body');
+        modalBody.innerHTML = `
+          <div style="text-align: center; padding: 40px 20px;">
+            <div style="color: #28a745; font-size: 48px; margin-bottom: 20px;">✓</div>
+            <h3 style="color: #28a745; margin-bottom: 15px;">Submitted Successfully!</h3>
+            <p style="color: #666; font-size: 16px;">Your Kids Activities registration has been submitted successfully.</p>
+          </div>
+        `;
+        
+        // Close modal after 2 seconds
+        setTimeout(() => {
+          closeKidsModal();
+          // Reset modal content for next use
+          setTimeout(() => {
+            modalBody.innerHTML = `
+              <form id="kidsModalForm" class="modal-rsvp-form" onsubmit="submitKidsModal(event)">
+                <div class="modal-form-group">
+                  <label for="kidsFlatNo">Flat No *</label>
+                  <input type="text" id="kidsFlatNo" name="flatno" placeholder="Flat No *" required class="modal-form-input" style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase()">
+                </div>
+                <div class="modal-form-group">
+                  <label for="kidsChildName">Child Name *</label>
+                  <input type="text" id="kidsChildName" name="childname" placeholder="Child Name *" required class="modal-form-input">
+                </div>
+                <div class="modal-form-group">
+                  <label for="kidsAge">Age</label>
+                  <input type="number" id="kidsAge" name="ag" placeholder="Age" class="modal-form-input" min="1" max="18">
+                </div>
+                <div class="modal-form-actions">
+                  <button type="submit" class="modal-submit-button">
+                    <span>Submit</span>
+                  </button>
+                </div>
+              </form>
+            `;
+          }, 500);
+        }, 2000);
       }
       
       function openResidentModal() {
@@ -1215,18 +1424,91 @@
         const name = formData.get('name');
         const age = formData.get('age');
         
-        // Construct the Google Forms URL with parameters
-        const baseUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSflLxDK2sLSF_wQIkmc6uJKjZKsEoQOfV9ZKKmQrQJvkKkuGw/viewform?usp=pp_url';
-        const url = `${baseUrl}&entry.556153216=${encodeURIComponent(flatNo)}&entry.1547567172=${encodeURIComponent(name)}&entry.173729754=${encodeURIComponent(age)}`;
+        // Create hidden form for submission
+        const hiddenForm = document.createElement('form');
+        hiddenForm.method = 'POST';
+        hiddenForm.action = 'https://docs.google.com/forms/d/e/1FAIpQLSflLxDK2sLSF_wQIkmc6uJKjZKsEoQOfV9ZKKmQrQJvkKkuGw/formResponse';
+        hiddenForm.target = 'hidden-iframe-resident';
+        hiddenForm.style.display = 'none';
         
-        // Open the Google form in a new tab with the pre-filled data
-        window.open(url, '_blank');
+        // Add form fields
+        const fields = [
+          { name: 'entry.556153216', value: flatNo },
+          { name: 'entry.1547567172', value: name },
+          { name: 'entry.173729754', value: age },
+          { name: 'submit', value: 'Submit' }
+        ];
         
-        // Close the modal
-        closeResidentModal();
+        fields.forEach(field => {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = field.name;
+          input.value = field.value;
+          hiddenForm.appendChild(input);
+        });
         
-        // Optional: Show success message
-        alert('Redirecting to Resident Games form...');
+        // Create hidden iframe
+        const iframe = document.createElement('iframe');
+        iframe.name = 'hidden-iframe-resident';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+        document.body.appendChild(hiddenForm);
+        
+        // Submit form using native submit method
+        const submitButton = document.createElement('input');
+        submitButton.type = 'submit';
+        submitButton.style.display = 'none';
+        hiddenForm.appendChild(submitButton);
+        submitButton.click();
+        
+        // Clean up after submission
+        setTimeout(() => {
+          if (document.body.contains(hiddenForm)) {
+            document.body.removeChild(hiddenForm);
+          }
+          if (document.body.contains(iframe)) {
+            document.body.removeChild(iframe);
+          }
+        }, 2000);
+        
+        // Show success message in the modal
+        const modalBody = document.querySelector('#residentModal .modal-body');
+        modalBody.innerHTML = `
+          <div style="text-align: center; padding: 40px 20px;">
+            <div style="color: #28a745; font-size: 48px; margin-bottom: 20px;">✓</div>
+            <h3 style="color: #28a745; margin-bottom: 15px;">Submitted Successfully!</h3>
+            <p style="color: #666; font-size: 16px;">Your Resident Games registration has been submitted successfully.</p>
+          </div>
+        `;
+        
+        // Close modal after 2 seconds
+        setTimeout(() => {
+          closeResidentModal();
+          // Reset modal content for next use
+          setTimeout(() => {
+            modalBody.innerHTML = `
+              <form id="residentModalForm" class="modal-rsvp-form" onsubmit="submitResidentModal(event)">
+                <div class="modal-form-group">
+                  <label for="residentFlatNo">Flat No *</label>
+                  <input type="text" id="residentFlatNo" name="flatno" placeholder="Flat No *" required class="modal-form-input" style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase()">
+                </div>
+                <div class="modal-form-group">
+                  <label for="residentName">Name *</label>
+                  <input type="text" id="residentName" name="name" placeholder="Name *" required class="modal-form-input">
+                </div>
+                <div class="modal-form-group">
+                  <label for="residentAge">Age</label>
+                  <input type="number" id="residentAge" name="age" placeholder="Age" class="modal-form-input" min="1" max="100">
+                </div>
+                <div class="modal-form-actions">
+                  <button type="submit" class="modal-submit-button">
+                    <span>Submit</span>
+                  </button>
+                </div>
+              </form>
+            `;
+          }, 500);
+        }, 2000);
       }
       
       function openStallsModal() {
@@ -1260,18 +1542,231 @@
         const phone = formData.get('phone');
         const name = formData.get('name');
         
-        // Construct the Google Forms URL with parameters
-        const baseUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSeWno4kAz4qb0nOPjrHHPwutRx_u9kreu3aHEudRiMIX2BjEA/viewform?usp=pp_url';
-        const url = `${baseUrl}&entry.1942657558=${encodeURIComponent(flatNo)}&entry.1061335196=${encodeURIComponent(stallType)}&entry.140136422=${encodeURIComponent(stallId)}&entry.472708449=${encodeURIComponent(phone)}&entry.794930411=${encodeURIComponent(name)}`;
+        // Create hidden form for submission
+        const hiddenForm = document.createElement('form');
+        hiddenForm.method = 'POST';
+        hiddenForm.action = 'https://docs.google.com/forms/d/e/1FAIpQLSeWno4kAz4qb0nOPjrHHPwutRx_u9kreu3aHEudRiMIX2BjEA/formResponse';
+        hiddenForm.target = 'hidden-iframe-stalls';
+        hiddenForm.style.display = 'none';
         
-        // Open the Google form in a new tab with the pre-filled data
-        window.open(url, '_blank');
+        // Add form fields
+        const fields = [
+          { name: 'entry.1942657558', value: flatNo },
+          { name: 'entry.1061335196', value: stallType },
+          { name: 'entry.140136422', value: stallId },
+          { name: 'entry.472708449', value: phone },
+          { name: 'entry.794930411', value: name },
+          { name: 'submit', value: 'Submit' }
+        ];
         
-        // Close the modal
-        closeStallsModal();
+        fields.forEach(field => {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = field.name;
+          input.value = field.value;
+          hiddenForm.appendChild(input);
+        });
         
-        // Optional: Show success message
-        alert('Redirecting to Stalls and Play Zone form...');
+        // Create hidden iframe
+        const iframe = document.createElement('iframe');
+        iframe.name = 'hidden-iframe-stalls';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+        document.body.appendChild(hiddenForm);
+        
+        // Submit form using native submit method
+        const submitButton = document.createElement('input');
+        submitButton.type = 'submit';
+        submitButton.style.display = 'none';
+        hiddenForm.appendChild(submitButton);
+        submitButton.click();
+        
+        // Clean up after submission
+        setTimeout(() => {
+          if (document.body.contains(hiddenForm)) {
+            document.body.removeChild(hiddenForm);
+          }
+          if (document.body.contains(iframe)) {
+            document.body.removeChild(iframe);
+          }
+        }, 2000);
+        
+        // Show success message in the modal
+        const modalBody = document.querySelector('#stallsModal .modal-body');
+        modalBody.innerHTML = `
+          <div style="text-align: center; padding: 40px 20px;">
+            <div style="color: #28a745; font-size: 48px; margin-bottom: 20px;">✓</div>
+            <h3 style="color: #28a745; margin-bottom: 15px;">Submitted Successfully!</h3>
+            <p style="color: #666; font-size: 16px;">Your Stalls and Play Zone registration has been submitted successfully.</p>
+          </div>
+        `;
+        
+        // Close modal after 2 seconds
+        setTimeout(() => {
+          closeStallsModal();
+          // Reset modal content for next use
+          setTimeout(() => {
+            modalBody.innerHTML = `
+              <form id="stallsModalForm" class="modal-rsvp-form" onsubmit="submitStallsModal(event)">
+                <div class="modal-form-group">
+                  <label for="stallsFlatNo">Flat No *</label>
+                  <input type="text" id="stallsFlatNo" name="flatno" placeholder="Flat No *" required class="modal-form-input" style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase()">
+                </div>
+                <div class="modal-form-group">
+                  <label for="stallsStallType">Stall Type *</label>
+                  <input type="text" id="stallsStallType" name="stalltype" placeholder="Stall Type *" required class="modal-form-input">
+                </div>
+                <div class="modal-form-group">
+                  <label for="stallsStallId">Stall ID *</label>
+                  <input type="text" id="stallsStallId" name="stallid" placeholder="Stall ID *" required class="modal-form-input">
+                </div>
+                <div class="modal-form-group">
+                  <label for="stallsPhone">Phone *</label>
+                  <input type="tel" id="stallsPhone" name="phone" placeholder="Phone *" required class="modal-form-input">
+                </div>
+                <div class="modal-form-group">
+                  <label for="stallsName">Name *</label>
+                  <input type="text" id="stallsName" name="name" placeholder="Name *" required class="modal-form-input">
+                </div>
+                <div class="modal-form-group">
+                  <div class="checkbox-container">
+                    <input type="checkbox" id="stallsTerms" name="terms" required class="modal-checkbox">
+                    <label for="stallsTerms" class="checkbox-label">
+                      I agree to the <a href="/stall-terms-and-conditions.html" target="_blank" class="terms-link">Terms & Conditions for Stall Participation</a> *
+                    </label>
+                  </div>
+                </div>
+                <div class="modal-form-actions">
+                  <button type="submit" class="modal-submit-button">
+                    <span>Submit</span>
+                  </button>
+                </div>
+              </form>
+            `;
+          }, 500);
+        }, 2000);
+      }
+      
+      function openIdeasModal() {
+        console.log('openIdeasModal called');
+        const modal = document.getElementById('ideasModal');
+        if (modal) {
+          console.log('Ideas modal element found, setting display to block');
+          modal.style.display = 'block';
+          modal.style.zIndex = '1001'; // Ensure it's above other elements
+          document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        } else {
+          console.error('ideasModal element not found');
+        }
+      }
+      
+      function closeIdeasModal() {
+        document.getElementById('ideasModal').style.display = 'none';
+        document.body.style.overflow = 'auto'; // Restore scrolling
+      }
+      
+      function submitIdeasModal(event) {
+        event.preventDefault();
+        
+        const form = document.getElementById('ideasModalForm');
+        const formData = new FormData(form);
+        
+        // Get form values
+        const flatNo = formData.get('flatno');
+        const activity = formData.get('activity');
+        const phone = formData.get('phone');
+        const name = formData.get('name');
+        
+        // Create hidden form for submission
+        const hiddenForm = document.createElement('form');
+        hiddenForm.method = 'POST';
+        hiddenForm.action = 'https://docs.google.com/forms/d/e/1FAIpQLSePEC2ggFLn7RTHHNb8PBUUngYqFuXyG4DQgFIgyOBAEg-KEA/formResponse';
+        hiddenForm.target = 'hidden-iframe-ideas';
+        hiddenForm.style.display = 'none';
+        
+        // Add form fields
+        const fields = [
+          { name: 'entry.1942657558', value: flatNo },
+          { name: 'entry.1061335196', value: activity },
+          { name: 'entry.472708449', value: phone },
+          { name: 'entry.794930411', value: name },
+          { name: 'submit', value: 'Submit' }
+        ];
+        
+        fields.forEach(field => {
+          const input = document.createElement('input');
+          input.type = 'hidden';
+          input.name = field.name;
+          input.value = field.value;
+          hiddenForm.appendChild(input);
+        });
+        
+        // Create hidden iframe
+        const iframe = document.createElement('iframe');
+        iframe.name = 'hidden-iframe-ideas';
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+        document.body.appendChild(hiddenForm);
+        
+        // Submit form using native submit method
+        const submitButton = document.createElement('input');
+        submitButton.type = 'submit';
+        submitButton.style.display = 'none';
+        hiddenForm.appendChild(submitButton);
+        submitButton.click();
+        
+        // Clean up after submission
+        setTimeout(() => {
+          if (document.body.contains(hiddenForm)) {
+            document.body.removeChild(hiddenForm);
+          }
+          if (document.body.contains(iframe)) {
+            document.body.removeChild(iframe);
+          }
+        }, 2000);
+        
+        // Show success message in the modal
+        const modalBody = document.querySelector('#ideasModal .modal-body');
+        modalBody.innerHTML = `
+          <div style="text-align: center; padding: 40px 20px;">
+            <div style="color: #28a745; font-size: 48px; margin-bottom: 20px;">✓</div>
+            <h3 style="color: #28a745; margin-bottom: 15px;">Submitted Successfully!</h3>
+            <p style="color: #666; font-size: 16px;">Your Ideas & Activities have been submitted successfully.</p>
+          </div>
+        `;
+        
+        // Close modal after 2 seconds
+        setTimeout(() => {
+          closeIdeasModal();
+          // Reset modal content for next use
+          setTimeout(() => {
+            modalBody.innerHTML = `
+              <form id="ideasModalForm" class="modal-rsvp-form" onsubmit="submitIdeasModal(event)">
+                <div class="modal-form-group">
+                  <label for="ideasFlatNo">Flat No *</label>
+                  <input type="text" id="ideasFlatNo" name="flatno" placeholder="Flat No *" required class="modal-form-input" style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase()">
+                </div>
+                <div class="modal-form-group">
+                  <label for="ideasActivity">Activity/Idea *</label>
+                  <textarea id="ideasActivity" name="activity" placeholder="Describe your activity or idea (e.g., Yoga session, Cultural dance, Special performance, etc.)" required class="modal-form-input" rows="4" style="resize: vertical;"></textarea>
+                </div>
+                <div class="modal-form-group">
+                  <label for="ideasPhone">Phone *</label>
+                  <input type="tel" id="ideasPhone" name="phone" placeholder="Phone *" required class="modal-form-input">
+                </div>
+                <div class="modal-form-group">
+                  <label for="ideasName">Name *</label>
+                  <input type="text" id="ideasName" name="name" placeholder="Name *" required class="modal-form-input">
+                </div>
+                <div class="modal-form-actions">
+                  <button type="submit" class="modal-submit-button">
+                    <span>Submit Ideas</span>
+                  </button>
+                </div>
+              </form>
+            `;
+          }, 500);
+        }, 2000);
       }
     </script>
   </body>
