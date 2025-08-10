@@ -615,9 +615,6 @@
                     <!--OutlineButton component-->
                       <div class="outline-button-container">
                         <a href="https://wa.me/9176848000?text=Hi, I would like to join Men's Cricket">
-                          <button class="outline-button-button Button button">
-                            <span>Enroll</span>
-                          </button>
                         </a>
                     </div>
                   </outline-button-wrapper>
@@ -660,11 +657,6 @@
                   <outline-button-wrapper class="outline-button-wrapper">
                     <!--OutlineButton component-->
                     <div class="outline-button-container">
-                      <a href="https://wa.me/8220142575?text=Hi, I would like to join Women's Throwball">
-                      <button class="outline-button-button Button button">
-                        <span>Enroll</span>
-                      </button>
-                      </a>
                     </div>
                   </outline-button-wrapper>
                 </div>
@@ -710,11 +702,6 @@
                   <outline-button-wrapper class="outline-button-wrapper">
                     <!--OutlineButton component-->
                     <div class="outline-button-container">
-                      <a href="https://wa.me/9841011777?text=Hi, I would like to join Carrom Board">
-                      <button class="outline-button-button Button button">
-                        <span>Enroll</span>
-                      </button>
-                      </a>
                     </div>
                   </outline-button-wrapper>
                 </div>
@@ -751,11 +738,6 @@
                   </span>
                   <outline-button-wrapper class="outline-button-wrapper">
                     <!--OutlineButton component-->
-                    <div class="outline-button-container">
-                      <button class="outline-button-button Button button" onclick="openKidsModal(); console.log('Button clicked');" style="cursor: pointer;">
-                        <span>Enroll</span>
-                      </button>
-                    </div>
                   </outline-button-wrapper>
                 </div>
               </div>
@@ -823,11 +805,6 @@
                   </span>
                   <outline-button-wrapper class="outline-button-wrapper">
                     <!--OutlineButton component-->
-                    <div class="outline-button-container">
-                      <button class="outline-button-button Button button" onclick="openResidentModal(); console.log('Resident button clicked');" style="cursor: pointer;">
-                        <span>Enroll</span>
-                      </button>
-                    </div>
                   </outline-button-wrapper>
                 </div>
               </div>
@@ -928,9 +905,6 @@
                   <outline-button-wrapper class="outline-button-wrapper">
                     <!--OutlineButton component-->
                     <div class="outline-button-container">
-                      <button class="outline-button-button Button button" onclick="openStallsModal(); console.log('Stalls button clicked');" style="cursor: pointer;">
-                        <span>Enroll</span>
-                      </button>
                     </div>
                   </outline-button-wrapper>
                 </div>
@@ -1115,7 +1089,7 @@
             </div>
             <div class="modal-form-group">
               <label for="ideasActivity">Activity/Idea *</label>
-              <textarea id="ideasActivity" name="activity" placeholder="Describe your activity or idea (e.g., Yoga session, Cultural dance, Special performance, etc.)" required class="modal-form-input" rows="4" style="resize: vertical;"></textarea>
+              <input type="text" id="ideasActivity" name="activity" placeholder="Describe your activity or idea (e.g., Yoga session, Cultural dance, Special performance, etc.)" required class="modal-form-input">
             </div>
             <div class="modal-form-group">
               <label for="ideasPhone">Phone *</label>
@@ -1732,49 +1706,33 @@
         const phone = formData.get('phone');
         const name = formData.get('name');
         
-        // Create hidden form for submission
-        const hiddenForm = document.createElement('form');
-        hiddenForm.method = 'POST';
-        hiddenForm.action = 'https://docs.google.com/forms/d/e/1FAIpQLSePEC2ggFLn7RTHHNb8PBUUngYqFuXyG4DQgFIgyOBAEg-KEA/formResponse';
-        hiddenForm.target = 'hidden-iframe-ideas';
-        hiddenForm.style.display = 'none';
-        
-        // Add form fields
-        const fields = [
-          { name: 'entry.1942657558', value: flatNo },
-          { name: 'entry.1061335196', value: activity },
-          { name: 'entry.472708449', value: phone },
-          { name: 'entry.794930411', value: name },
-          { name: 'submit', value: 'Submit' }
-        ];
-        
-        fields.forEach(field => {
-          const input = document.createElement('input');
-          input.type = 'hidden';
-          input.name = field.name;
-          input.value = field.value;
-          hiddenForm.appendChild(input);
+        // Create URL with query parameters
+        const baseUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSePEC2ggFLn7RTHHNb8PBUUngYqFuXyG4DQgFIgyOBAEg-KEA/formResponse';
+        const queryParams = new URLSearchParams({
+          'entry.1942657558': flatNo,
+          'entry.1061335196': activity,
+          'entry.472708449': phone,
+          'entry.794930411': name,
+          'submit': 'Submit'
         });
         
-        // Create hidden iframe
+        const fullUrl = `${baseUrl}?${queryParams.toString()}`;
+        
+        // Log the full URL with query parameters
+        console.log('Submitting to URL:', fullUrl);
+        console.log('Form data:', { flatNo, activity, phone, name });
+        
+        // Create hidden iframe for submission
         const iframe = document.createElement('iframe');
         iframe.name = 'hidden-iframe-ideas';
         iframe.style.display = 'none';
         document.body.appendChild(iframe);
-        document.body.appendChild(hiddenForm);
         
-        // Submit form using native submit method
-        const submitButton = document.createElement('input');
-        submitButton.type = 'submit';
-        submitButton.style.display = 'none';
-        hiddenForm.appendChild(submitButton);
-        submitButton.click();
+        // Navigate iframe to the URL with query parameters
+        iframe.src = fullUrl;
         
         // Clean up after submission
         setTimeout(() => {
-          if (document.body.contains(hiddenForm)) {
-            document.body.removeChild(hiddenForm);
-          }
           if (document.body.contains(iframe)) {
             document.body.removeChild(iframe);
           }
@@ -1803,7 +1761,7 @@
                 </div>
                 <div class="modal-form-group">
                   <label for="ideasActivity">Activity/Idea *</label>
-                  <textarea id="ideasActivity" name="activity" placeholder="Describe your activity or idea (e.g., Yoga session, Cultural dance, Special performance, etc.)" required class="modal-form-input" rows="4" style="resize: vertical;"></textarea>
+                  <input type="text" id="ideasActivity" name="activity" placeholder="Describe your activity or idea (e.g., Yoga session, Cultural dance, Special performance, etc.)" required class="modal-form-input">
                 </div>
                 <div class="modal-form-group">
                   <label for="ideasPhone">Phone *</label>
