@@ -4,7 +4,8 @@
   "private": true,
   "description": "The ACE Independence Day Event Website",
   "scripts": {
-    "dev": "echo 'Static site - serve with any HTTP server'",
+    "dev": "npx http-server . -p 3001 -o --cors",
+    "start": "npx http-server . -p 3001 --cors",
     "deploy": "wrangler deploy"
   },
   "devDependencies": {},
