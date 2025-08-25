@@ -118,12 +118,13 @@
     return { x: cx, y: cy };
   }
             
-            function startDraw(evt) {
-                if (!canvasRef.current) return;
-                isDrawingRef.current = true;
-                const p = getCanvasPoint(evt);
-                lastPointRef.current = p;
-            }
+              function startDraw(evt) {
+    if (!canvasRef.current) return;
+    evt.preventDefault(); // Prevent default touch behavior
+    isDrawingRef.current = true;
+    const p = getCanvasPoint(evt);
+    lastPointRef.current = p;
+  }
             
               function moveDraw(evt) {
     if (!isDrawingRef.current || !canvasRef.current) return;
@@ -390,7 +391,12 @@
                       width={800}
                       height={120}
                       className="w-full h-40 bg-white rounded-lg border"
-                      style={{ aspectRatio: '800/120' }}
+                      style={{ 
+                        aspectRatio: '800/120',
+                        touchAction: 'none',
+                        userSelect: 'none',
+                        WebkitUserSelect: 'none'
+                      }}
                       onMouseDown={startDraw}
                       onMouseMove={moveDraw}
                       onMouseUp={endDraw}
@@ -398,6 +404,7 @@
                       onTouchStart={startDraw}
                       onTouchMove={moveDraw}
                       onTouchEnd={endDraw}
+                      onTouchCancel={endDraw}
                     />
                     <div className="mt-2 flex gap-2">
                       <button type="button" onClick={clearSignature} className="rounded-lg border px-3 py-1 text-sm">Clear</button>
