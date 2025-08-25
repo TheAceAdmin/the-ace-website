@@ -100,13 +100,23 @@
                 window.print();
             }
 
-            function getCanvasPoint(evt) {
-                const canvas = canvasRef.current;
-                const rect = canvas.getBoundingClientRect();
-                const cx = (evt.clientX ?? (evt.touches && evt.touches[0]?.clientX)) - rect.left;
-                const cy = (evt.clientY ?? (evt.touches && evt.touches[0]?.clientY)) - rect.top;
-                return { x: cx, y: cy };
-            }
+              function getCanvasPoint(evt) {
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    
+    // Get the canvas scaling factor (CSS size vs actual canvas size)
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    // Calculate mouse position relative to canvas
+    const clientX = evt.clientX ?? (evt.touches && evt.touches[0]?.clientX);
+    const clientY = evt.clientY ?? (evt.touches && evt.touches[0]?.clientY);
+    
+    const cx = (clientX - rect.left) * scaleX;
+    const cy = (clientY - rect.top) * scaleY;
+    
+    return { x: cx, y: cy };
+  }
             
             function startDraw(evt) {
                 if (!canvasRef.current) return;
@@ -115,20 +125,21 @@
                 lastPointRef.current = p;
             }
             
-            function moveDraw(evt) {
-                if (!isDrawingRef.current || !canvasRef.current) return;
-                evt.preventDefault();
-                const ctx = canvasRef.current.getContext("2d");
-                ctx.lineWidth = 2;
-                ctx.lineCap = "round";
-                ctx.strokeStyle = "#111";
-                const p = getCanvasPoint(evt);
-                ctx.beginPath();
-                ctx.moveTo(lastPointRef.current.x, lastPointRef.current.y);
-                ctx.lineTo(p.x, p.y);
-                ctx.stroke();
-                lastPointRef.current = p;
-            }
+              function moveDraw(evt) {
+    if (!isDrawingRef.current || !canvasRef.current) return;
+    evt.preventDefault();
+    const ctx = canvasRef.current.getContext("2d");
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = "#111";
+    const p = getCanvasPoint(evt);
+    ctx.beginPath();
+    ctx.moveTo(lastPointRef.current.x, lastPointRef.current.y);
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+    lastPointRef.current = p;
+  }
             
             function endDraw() {
                 if (!canvasRef.current) return;
@@ -283,10 +294,22 @@
                                 </div>
 
                                 <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-3">
-                                    <div>
-                                        <label className="text-sm font-medium">Mobile</label>
-                                        <input value={data.mobile} onChange={(e) => update("mobile", e.target.value)} className="mt-1 w-full rounded-xl border p-2" placeholder="10-digit number" />
-                                    </div>
+                                                  <div>
+                <label className="text-sm font-medium">Mobile</label>
+                <input 
+                    value={data.mobile} 
+                    onChange={(e) => {
+                        const value = e.target.value;
+                        if (/^\d*$/.test(value)) {
+                            update("mobile", value);
+                        }
+                    }}
+                    className="mt-1 w-full rounded-xl border p-2" 
+                    placeholder="10-digit number" 
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                />
+              </div>
                                     <div>
                                         <label className="text-sm font-medium">Email</label>
                                         <input value={data.email} onChange={(e) => update("email", e.target.value)} className="mt-1 w-full rounded-xl border p-2" placeholder="you@example.com" />
@@ -355,45 +378,46 @@
                                 </div>
 
                                 {/* Signature input (draw or type) */}
-                                <div className="mt-8">
-                                    <h3 className="font-semibold mb-2">Signature (input box)</h3>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {/* Drawn signature */}
-                                        <div>
-                                            <div className="text-sm mb-1">Draw your signature</div>
-                                            <div className="border rounded-xl p-3">
-                                                <canvas
-                                                    ref={canvasRef}
-                                                    width={520}
-                                                    height={160}
-                                                    className="w-full h-40 bg-white rounded-lg border"
-                                                    onMouseDown={startDraw}
-                                                    onMouseMove={moveDraw}
-                                                    onMouseUp={endDraw}
-                                                    onMouseLeave={endDraw}
-                                                    onTouchStart={startDraw}
-                                                    onTouchMove={moveDraw}
-                                                    onTouchEnd={endDraw}
-                                                />
-                                                <div className="mt-2 flex gap-2">
-                                                    <button type="button" onClick={clearSignature} className="rounded-lg border px-3 py-1 text-sm">Clear</button>
-                                                    <span className="text-xs text-neutral-600 self-center">Saved automatically to preview</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        {/* Typed signature */}
-                                        <div>
-                                            <div className="text-sm mb-1">Or type your name</div>
-                                            <input
-                                                value={data.typedSignature}
-                                                onChange={(e) => update("typedSignature", e.target.value)}
-                                                placeholder="Type full name as signature"
-                                                className="w-full rounded-xl border p-2"
-                                            />
-                                            <div className="mt-2 text-xs text-neutral-600">If both drawn and typed are provided, the <span className="font-medium">drawn</span> signature will be used in the print.</div>
-                                        </div>
-                                    </div>
-                                </div>
+                                            <div className="mt-8">
+              <h3 className="font-semibold mb-2">Signature (input box)</h3>
+              <div className="space-y-4">
+                {/* Drawn signature - full width */}
+                <div>
+                  <div className="text-sm mb-1">Draw your signature</div>
+                  <div className="border rounded-xl p-3">
+                    <canvas
+                      ref={canvasRef}
+                      width={800}
+                      height={120}
+                      className="w-full h-40 bg-white rounded-lg border"
+                      style={{ aspectRatio: '800/120' }}
+                      onMouseDown={startDraw}
+                      onMouseMove={moveDraw}
+                      onMouseUp={endDraw}
+                      onMouseLeave={endDraw}
+                      onTouchStart={startDraw}
+                      onTouchMove={moveDraw}
+                      onTouchEnd={endDraw}
+                    />
+                    <div className="mt-2 flex gap-2">
+                      <button type="button" onClick={clearSignature} className="rounded-lg border px-3 py-1 text-sm">Clear</button>
+                      <span className="text-xs text-neutral-600 self-center">Saved automatically to preview</span>
+                    </div>
+                  </div>
+                </div>
+                {/* Typed signature - full width */}
+                <div>
+                  <div className="text-sm mb-1">Type applicant's name</div>
+                  <input
+                    value={data.typedSignature}
+                    onChange={(e) => update("typedSignature", e.target.value)}
+                    placeholder="Type full name as signature"
+                    className="w-full rounded-xl border p-2"
+                  />
+                  <div className="mt-2 text-xs text-neutral-600">If both drawn and typed are provided, the <span className="font-medium">drawn</span> signature will be used in the print.</div>
+                </div>
+              </div>
+            </div>
 
                                 <div className="mt-6 flex gap-3">
                                     <button data-testid="print-button" onClick={handlePrint} className="rounded-2xl px-4 py-2 bg-black text-white shadow hover:shadow-md active:scale-[.99]">Print filled form</button>
@@ -449,10 +473,13 @@
             return <div className="min-h-8 border-b border-dashed pb-1">{children}</div>;
         }
 
-        function PrintableView({ data, photoUrl, showAssociationSignBox }) {
+        const PrintableView = React.memo(function PrintableView({ data, photoUrl, showAssociationSignBox }) {
             const today = useMemo(() => new Date().toLocaleDateString(), []);
             const hasDrawnSignature = !!data.signatureDataUrl;
             const hasTypedSignature = !!data.typedSignature?.trim();
+            
+
+            
             return (
                 <div className="space-y-5">
                     {/* Association Header */}
@@ -594,16 +621,25 @@
                     {/* Signature Boxes */}
                     <div className="grid grid-cols-12 gap-4 mt-12">
                         <div className="col-span-6 flex justify-start" data-testid="signature-applicant">
-                            <div className="w-56 text-center">
+                            <div className="w-80 text-center">
                                 {/* Signature rendering preference: drawn > typed > empty line */}
                                 <div className="h-20 flex items-center justify-center border-b border-neutral-800">
                                     {hasDrawnSignature ? (
-                                        <img src={data.signatureDataUrl} alt="Signature" className="max-h-16 object-contain" />
+                                        <img 
+                                            src={data.signatureDataUrl} 
+                                            alt="Signature" 
+                                            className="max-h-16 max-w-full object-contain" 
+                                            style={{ width: 'auto', height: 'auto' }}
+                                        />
                                     ) : hasTypedSignature ? (
                                         <span style={{ fontFamily: 'cursive', fontSize: '1.1rem' }}>{data.typedSignature}</span>
                                     ) : null}
                                 </div>
                                 <div className="text-sm mt-1">(Signature of the Applicant)</div>
+                                {(hasDrawnSignature || hasTypedSignature) && data.typedSignature && (
+                                    <div className="text-sm mt-1 font-medium">{data.typedSignature}</div>
+                                )}
+
                             </div>
                         </div>
                         {showAssociationSignBox && (
@@ -627,13 +663,9 @@
                         </div>
                     )}
 
-                    {/* Footer note */}
-                    <div className="text-[11px] text-neutral-500 mt-6">
-                        Note: This print-friendly layout mirrors the association's membership form format for convenience. Submit the printed copy with required enclosures as per association instructions.
-                    </div>
                 </div>
             );
-        }
+        });
 
         // Render the app
         const root = ReactDOM.createRoot(document.getElementById('root'));
