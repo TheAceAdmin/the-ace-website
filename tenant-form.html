@@ -36,6 +36,7 @@
                     details: "",
                     location: "",
                     signatureDataUrl: "",
+                    canvasSignatureUrl: "",
                     photoUrl: ""
                 }],
                 rentAmount: "",
@@ -46,6 +47,7 @@
                 date: "",
                 photoUrl: "",
                 signatureDataUrl: "",
+                canvasSignatureUrl: "",
                 jointUndertaking: "",
             });
 
@@ -167,6 +169,7 @@
                     details: "",
                     location: "",
                     signatureDataUrl: "",
+                    canvasSignatureUrl: "",
                     photoUrl: ""
                 }] }));
             }
@@ -255,16 +258,80 @@
                 
                 canvas.dataset.drawing = "false";
                 const url = canvas.toDataURL();
-                setOwner(ownerIndex, "signatureDataUrl", url);
+                setOwner(ownerIndex, "canvasSignatureUrl", url);
             }
 
             function clearOwnerSignature(ownerIndex) {
-                setOwner(ownerIndex, "signatureDataUrl", "");
+                // Clear the canvas and canvas signature data, but keep uploaded signature
                 const canvas = document.querySelector(`canvas[data-owner-index="${ownerIndex}"]`);
                 if (canvas) {
                     const ctx = canvas.getContext("2d");
                     ctx.clearRect(0, 0, canvas.width, canvas.height);
                 }
+                // Clear the canvas signature data but keep uploaded signature
+                setOwner(ownerIndex, "canvasSignatureUrl", "");
+            }
+
+            // Main signature functions
+            const canvasRef = React.useRef(null);
+            const isDrawingRef = React.useRef(false);
+            const lastPointRef = React.useRef({ x: 0, y: 0 });
+
+            function getCanvasPoint(evt) {
+                const canvas = canvasRef.current;
+                const rect = canvas.getBoundingClientRect();
+                
+                // Get the canvas scaling factor (CSS size vs actual canvas size)
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                
+                // Calculate mouse position relative to canvas
+                const clientX = evt.clientX ?? (evt.touches && evt.touches[0]?.clientX);
+                const clientY = evt.clientY ?? (evt.touches && evt.touches[0]?.clientY);
+                
+                const cx = (clientX - rect.left) * scaleX;
+                const cy = (clientY - rect.top) * scaleY;
+                
+                return { x: cx, y: cy };
+            }
+            
+            function startDraw(evt) {
+                if (!canvasRef.current) return;
+                evt.preventDefault(); // Prevent default touch behavior
+                isDrawingRef.current = true;
+                const p = getCanvasPoint(evt);
+                lastPointRef.current = p;
+            }
+            
+            function moveDraw(evt) {
+                if (!isDrawingRef.current || !canvasRef.current) return;
+                evt.preventDefault();
+                const ctx = canvasRef.current.getContext("2d");
+                ctx.lineWidth = 2;
+                ctx.lineCap = "round";
+                ctx.lineJoin = "round";
+                ctx.strokeStyle = "#111";
+                const p = getCanvasPoint(evt);
+                ctx.beginPath();
+                ctx.moveTo(lastPointRef.current.x, lastPointRef.current.y);
+                ctx.lineTo(p.x, p.y);
+                ctx.stroke();
+                lastPointRef.current = p;
+            }
+            
+            function endDraw() {
+                if (!canvasRef.current) return;
+                isDrawingRef.current = false;
+                const url = canvasRef.current.toDataURL("image/png");
+                update("canvasSignatureUrl", url);
+            }
+            
+            function clearSignature() {
+                if (!canvasRef.current) return;
+                const ctx = canvasRef.current.getContext("2d");
+                ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+                // Clear the canvas signature data but keep uploaded signature
+                update("canvasSignatureUrl", "");
             }
 
             // Smoke tests
@@ -543,11 +610,12 @@
                                                                     </svg>
                                                                 </button>
                                                             </div>
-                                                            <div className="space-y-2">
-                                                                <input
-                                                                    type="file"
-                                                                    accept="image/*"
-                                                                                                                                    onChange={(e) => {
+                                                                                                                        <div className="space-y-2">
+                                                                                                                            <input
+                                                                type="file"
+                                                                accept="image/*"
+                                                                data-owner-index={index}
+                                                                onChange={(e) => {
                                                                     const file = e.target.files && e.target.files[0];
                                                                     if (file) {
                                                                         const reader = new FileReader();
@@ -557,8 +625,27 @@
                                                                         reader.readAsDataURL(file);
                                                                     }
                                                                 }}
-                                                                    className="w-full text-sm border rounded-lg p-2"
-                                                                />
+                                                                className="w-full text-sm border rounded-lg p-2"
+                                                            />
+                                                                {owner.signatureDataUrl && (
+                                                                    <div className="flex items-center gap-2">
+                                                                        <span className="text-xs text-green-600">✓ Signature uploaded</span>
+                                                                        <button 
+                                                                            type="button"
+                                                                            onClick={() => {
+                                                                                setOwner(index, "signatureDataUrl", "");
+                                                                                // Reset the file input
+                                                                                const fileInput = document.querySelector(`input[type="file"][data-owner-index="${index}"]`);
+                                                                                if (fileInput) {
+                                                                                    fileInput.value = "";
+                                                                                }
+                                                                            }}
+                                                                            className="text-xs text-red-600 hover:text-red-800"
+                                                                        >
+                                                                            Remove
+                                                                        </button>
+                                                                    </div>
+                                                                )}
                                                             </div>
                                                         </div>
                                                     </div>
@@ -597,6 +684,81 @@
                                 <div className="mt-6">
                                     <label className="text-sm font-medium">Place</label>
                                     <input value={data.place} onChange={(e) => update("place", e.target.value)} className="mt-1 w-full rounded-xl border p-2" placeholder="e.g., Chennai" />
+                                </div>
+
+                                {/* Main Tenant Signature Upload */}
+                                <div className="mt-6">
+                                    <label className="text-sm font-medium">Main Tenant Signature</label>
+                                    <div className="mt-3 space-y-3">
+                                        <div className="space-y-2 relative">
+                                            <canvas
+                                                ref={canvasRef}
+                                                width={300}
+                                                height={120}
+                                                className="w-full h-24 bg-white rounded-lg border cursor-crosshair"
+                                                style={{ 
+                                                    touchAction: 'none',
+                                                    userSelect: 'none',
+                                                    WebkitUserSelect: 'none'
+                                                }}
+                                                onMouseDown={startDraw}
+                                                onMouseMove={moveDraw}
+                                                onMouseUp={endDraw}
+                                                onMouseLeave={endDraw}
+                                                onTouchStart={startDraw}
+                                                onTouchMove={moveDraw}
+                                                onTouchEnd={endDraw}
+                                                onTouchCancel={endDraw}
+                                            />
+                                            <button 
+                                                type="button" 
+                                                onClick={clearSignature} 
+                                                className="absolute top-2 right-2 p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-full transition-colors"
+                                                title="Clear signature"
+                                            >
+                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1-1H9a1 1 0 00-1 1v3M4 7h16" />
+                                                </svg>
+                                            </button>
+                                        </div>
+                                        <div className="space-y-2">
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                data-main-signature="true"
+                                                onChange={(e) => {
+                                                    const file = e.target.files && e.target.files[0];
+                                                    if (file) {
+                                                        const reader = new FileReader();
+                                                        reader.onload = (e) => {
+                                                            update("signatureDataUrl", e.target.result);
+                                                        };
+                                                        reader.readAsDataURL(file);
+                                                    }
+                                                }}
+                                                className="w-full text-sm border rounded-lg p-2"
+                                            />
+                                            {data.signatureDataUrl && (
+                                                <div className="flex items-center gap-2">
+                                                    <span className="text-xs text-green-600">✓ Signature uploaded</span>
+                                                    <button 
+                                                        type="button"
+                                                        onClick={() => {
+                                                            update("signatureDataUrl", "");
+                                                            // Reset the file input
+                                                            const fileInput = document.querySelector('input[type="file"][data-main-signature="true"]');
+                                                            if (fileInput) {
+                                                                fileInput.value = "";
+                                                            }
+                                                        }}
+                                                        className="text-xs text-red-600 hover:text-red-800"
+                                                    >
+                                                        Remove
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
 
                             </div>
@@ -1017,6 +1179,13 @@
                                                 className="max-h-16 max-w-full object-contain" 
                                                 style={{ width: 'auto', height: 'auto' }}
                                             />
+                                        ) : data.owners[0]?.canvasSignatureUrl ? (
+                                            <img 
+                                                src={data.owners[0].canvasSignatureUrl} 
+                                                alt="Canvas Signature" 
+                                                className="max-h-16 max-w-full object-contain" 
+                                                style={{ width: 'auto', height: 'auto' }}
+                                            />
                                         ) : null}
                                     </div>
                                 </div>
@@ -1025,6 +1194,33 @@
                                     <div className="text-sm mt-1 font-medium">{data.owners[0]?.title || "Mr"} {data.owners[0].name}</div>
                                 )}
                             </div>
+
+                            {/* Main Tenant Signature (if different from member) */}
+                            {data.signatureDataUrl || data.canvasSignatureUrl ? (
+                                <div className="text-left">
+                                    <div className="flex items-center gap-4">
+                                        {/* Main Tenant Signature */}
+                                        <div className="h-20 w-48 flex items-center justify-center border-b border-neutral-800">
+                                            {data.signatureDataUrl ? (
+                                                <img 
+                                                    src={data.signatureDataUrl} 
+                                                    alt="Main Tenant Signature" 
+                                                    className="max-h-16 max-w-full object-contain" 
+                                                    style={{ width: 'auto', height: 'auto' }}
+                                                />
+                                            ) : data.canvasSignatureUrl ? (
+                                                <img 
+                                                    src={data.canvasSignatureUrl} 
+                                                    alt="Main Tenant Canvas Signature" 
+                                                    className="max-h-16 max-w-full object-contain" 
+                                                    style={{ width: 'auto', height: 'auto' }}
+                                                />
+                                            ) : null}
+                                        </div>
+                                    </div>
+                                    <div className="text-sm mt-1">(Main Tenant Signature)</div>
+                                </div>
+                            ) : null}
 
                             {/* Joint Member Photos and Signatures */}
                             {data.owners
@@ -1043,6 +1239,13 @@
                                                     <img 
                                                         src={owner.signatureDataUrl} 
                                                         alt="Owner Signature" 
+                                                        className="max-h-16 max-w-full object-contain" 
+                                                        style={{ width: 'auto', height: 'auto' }}
+                                                    />
+                                                ) : owner.canvasSignatureUrl ? (
+                                                    <img 
+                                                        src={owner.canvasSignatureUrl} 
+                                                        alt="Canvas Signature" 
                                                         className="max-h-16 max-w-full object-contain" 
                                                         style={{ width: 'auto', height: 'auto' }}
                                                     />
