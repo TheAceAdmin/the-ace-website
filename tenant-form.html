@@ -50,8 +50,101 @@
             });
 
             const [showAssociationSignBox, setShowAssociationSignBox] = React.useState(false);
-            const [photoUrl, setPhotoUrl] = React.useState("");
-            const photoInputRef = React.useRef();
+            const [savedForms, setSavedForms] = React.useState([]);
+            const [showSavedForms, setShowSavedForms] = React.useState(false);
+            const [currentFormId, setCurrentFormId] = React.useState(null);
+
+            // Load saved forms from localStorage on component mount
+            React.useEffect(() => {
+                const saved = localStorage.getItem('aceTenantForms');
+                if (saved) {
+                    try {
+                        const parsedData = JSON.parse(saved);
+                        setSavedForms(parsedData);
+                    } catch (e) {
+                        console.error('Error loading saved forms:', e);
+                    }
+                }
+            }, []);
+
+            // Save current form data
+            function saveForm() {
+                console.log('Save form function called');
+                console.log('Current data:', data);
+                
+                const formName = prompt('Enter a name for this form:');
+                if (!formName || !formName.trim()) {
+                    console.log('No form name provided, cancelling save');
+                    return;
+                }
+                
+                console.log('Saving form with name:', formName);
+                
+                const formData = {
+                    id: Date.now(),
+                    name: formName.trim(),
+                    data: { ...data },
+                    createdAt: new Date().toISOString(),
+                    lastModified: new Date().toISOString()
+                };
+                
+                console.log('Form data to save:', formData);
+                
+                const updatedForms = [...savedForms, formData];
+                setSavedForms(updatedForms);
+                setCurrentFormId(formData.id);
+                localStorage.setItem('aceTenantForms', JSON.stringify(updatedForms));
+                
+                console.log('Form saved successfully');
+                alert(`Form "${formName}" saved successfully!`);
+            }
+
+            // Auto-save function
+            function autoSave() {
+                if (currentFormId) {
+                    const updatedForms = savedForms.map(form => 
+                        form.id === currentFormId 
+                            ? { ...form, data: { ...data }, lastModified: new Date().toISOString() }
+                            : form
+                    );
+                    setSavedForms(updatedForms);
+                    localStorage.setItem('aceTenantForms', JSON.stringify(updatedForms));
+                }
+            }
+
+            // Load a saved form
+            function loadForm(formId) {
+                const form = savedForms.find(f => f.id === formId);
+                if (form) {
+                    if (confirm(`Load form "${form.name}"? This will replace your current form data.`)) {
+                        setData({ ...form.data });
+                        setCurrentFormId(formId);
+                        setShowSavedForms(false);
+                        alert(`Form "${form.name}" loaded successfully!`);
+                    }
+                }
+            }
+
+            // Delete a saved form
+            function deleteForm(formId) {
+                const form = savedForms.find(f => f.id === formId);
+                if (form && confirm(`Delete form "${form.name}"? This action cannot be undone.`)) {
+                    const updatedForms = savedForms.filter(f => f.id !== formId);
+                    setSavedForms(updatedForms);
+                    if (currentFormId === formId) {
+                        setCurrentFormId(null);
+                    }
+                    localStorage.setItem('aceTenantForms', JSON.stringify(updatedForms));
+                }
+            }
+
+            // Auto-save when important fields change (only if form was previously saved)
+            React.useEffect(() => {
+                if (currentFormId) {
+                    const timeoutId = setTimeout(autoSave, 1000); // Debounce auto-save
+                    return () => clearTimeout(timeoutId);
+                }
+            }, [data.owners, data.block, data.flatNo, data.areaSqft, data.leaseStartDate, data.leaseEndDate, data.place]);
 
             function update(field, value) {
                 setData(d => ({ ...d, [field]: value }));
@@ -83,15 +176,6 @@
 
             function removeOwnerRow(index) {
                 setData(d => ({ ...d, owners: d.owners.filter((_, i) => i !== index) }));
-            }
-
-            function onSelectPhoto(e) {
-                const file = e.target.files[0];
-                if (file) {
-                    const url = URL.createObjectURL(file);
-                    setPhotoUrl(url);
-                    update("photoUrl", url);
-                }
             }
 
             function handlePrint() {
@@ -172,7 +256,7 @@
                     {/* Header */}
                     <div className="bg-white shadow-sm border-b print:hidden">
                         <div className="max-w-6xl mx-auto px-4 py-4">
-                            <div className="flex items-center justify-between">
+                            <div className="flex flex-col items-center gap-3">
                                 <div className="flex items-center gap-4">
                                     <img src="/public/taaowa-logo.jpeg" alt="THE ACE Logo" className="h-12 w-12 object-contain" />
                                     <div>
@@ -181,8 +265,21 @@
                                     </div>
                                 </div>
                                 <div className="flex gap-2">
-                                    <a href="https://www.aceapartment.org/" className="rounded-2xl px-4 py-2 bg-gray-600 text-white shadow hover:shadow-md active:scale-[.99]">← Back to Home</a>
-                                    <button data-testid="print-button" onClick={handlePrint} className="rounded-2xl px-4 py-2 bg-black text-white shadow hover:shadow-md active:scale-[.99]">Print filled form</button>
+                                    <a href="https://www.aceapartment.org/" className="rounded-2xl px-3 py-2 bg-gray-600 text-white shadow hover:shadow-md active:scale-[.99] text-sm">← Back to Home</a>
+                                    <button 
+                                        onClick={saveForm} 
+                                        className="rounded-2xl px-3 py-2 bg-green-600 text-white shadow hover:shadow-md active:scale-[.99] text-sm"
+                                    >
+                                        💾 Save Form
+                                    </button>
+                                    <button onClick={() => setShowSavedForms(!showSavedForms)} className="rounded-2xl px-3 py-2 bg-blue-600 text-white shadow hover:shadow-md active:scale-[.99] text-sm">📁 Load Form</button>
+                                    <button data-testid="print-button" onClick={handlePrint} className="rounded-2xl px-3 py-2 bg-black text-white shadow hover:shadow-md active:scale-[.99] text-sm">Print filled form</button>
+                                    {currentFormId && (
+                                        <div className="flex items-center gap-2 px-2 py-1 bg-green-100 text-green-800 rounded-lg text-xs">
+                                            <span className="animate-pulse">💾</span>
+                                            Auto-saved
+                                        </div>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -467,20 +564,85 @@
                                     <input value={data.place} onChange={(e) => update("place", e.target.value)} className="mt-1 w-full rounded-xl border p-2" placeholder="e.g., Chennai" />
                                 </div>
 
-                                <div className="mt-6 flex gap-3">
-                                    <button data-testid="print-button" onClick={handlePrint} className="rounded-2xl px-4 py-2 bg-black text-white shadow hover:shadow-md active:scale-[.99]">Print filled form</button>
-                                    <p className="text-sm text-neutral-600 self-center">This opens your browser's print dialog (choose a printer or "Save as PDF").</p>
-                                </div>
                             </div>
                         </section>
 
                         {/* Preview/Printable column */}
                         <section>
                             <div id="printable" className="rounded-2xl bg-white p-6 shadow-sm print:shadow-none print:rounded-none">
-                                <PrintableView data={data} photoUrl={photoUrl} showAssociationSignBox={showAssociationSignBox} />
+                                <PrintableView data={data} /* photoUrl={photoUrl} */ showAssociationSignBox={showAssociationSignBox} />
                             </div>
                         </section>
                     </div>
+
+                    {/* Saved Forms Modal */}
+                    {showSavedForms && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                            <div className="bg-white rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+                                <div className="flex items-center justify-between mb-4">
+                                    <h3 className="text-lg font-semibold">Saved Forms</h3>
+                                    <button 
+                                        onClick={() => setShowSavedForms(false)}
+                                        className="text-gray-500 hover:text-gray-700 text-2xl"
+                                    >
+                                        ×
+                                    </button>
+                                </div>
+                                
+                                {savedForms.length === 0 ? (
+                                    <div className="text-center py-8 text-gray-500">
+                                        <div className="text-4xl mb-2">📁</div>
+                                        <p>No saved forms yet.</p>
+                                        <p className="text-sm">Save your current form to see it here.</p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-3">
+                                        {savedForms.map((form) => (
+                                            <div key={form.id} className="border rounded-lg p-4 hover:bg-gray-50">
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex-1">
+                                                        <h4 className="font-medium text-gray-900">{form.name}</h4>
+                                                        <div className="text-sm text-gray-500 mt-1">
+                                                            <span>Created: {new Date(form.createdAt).toLocaleDateString()}</span>
+                                                            <span className="mx-2">•</span>
+                                                            <span>Modified: {new Date(form.lastModified).toLocaleDateString()}</span>
+                                                        </div>
+                                                        <div className="text-xs text-gray-400 mt-1">
+                                                            {form.data.owners[0]?.name ? `Primary: ${form.data.owners[0].title} ${form.data.owners[0].name}` : 'No primary member'}
+                                                            {form.data.block && form.data.flatNo && ` • ${form.data.block}${form.data.flatNo}`}
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex gap-2 ml-4">
+                                                        <button 
+                                                            onClick={() => loadForm(form.id)}
+                                                            className="px-3 py-1 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
+                                                        >
+                                                            Load
+                                                        </button>
+                                                        <button 
+                                                            onClick={() => deleteForm(form.id)}
+                                                            className="px-3 py-1 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors"
+                                                        >
+                                                            Delete
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
+                                
+                                <div className="mt-6 text-center">
+                                    <button 
+                                        onClick={() => setShowSavedForms(false)}
+                                        className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                                    >
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
                     <style>{`
                         @page { 
@@ -520,7 +682,7 @@
             return <div className="min-h-8 border-b border-dashed pb-1">{children}</div>;
         }
 
-        const PrintableView = React.memo(function PrintableView({ data, photoUrl, showAssociationSignBox }) {
+        const PrintableView = React.memo(function PrintableView({ data, showAssociationSignBox }) {
             const today = React.useMemo(() => new Date().toLocaleDateString(), []);
             
             return (
@@ -544,12 +706,12 @@
 
                     {/* Salutation paragraph */}
                     <div className="text-sm leading-6">
-                        I, {data.owners[0]?.title || "Mr"} <span className="font-medium">{data.owners[0]?.name || "__________"}</span> hereby submit an application for tenancy of the {data.buildingName} Apartment.
+                        I, <b>{data.owners[0]?.title || "Mr"} {data.owners[0]?.name || "__________"}</b> hereby submit an application for tenancy of the <b>{data.buildingName}</b> Apartment.
                     </div>
 
                     {/* Member table */}
                     <div>
-                        <div className="font-semibold">Member details</div>
+                        <div className="font-semibold">Tenant details</div>
                         <table className="mt-2 w-full text-sm">
                             <thead>
                                 <tr className="border-b">
@@ -598,7 +760,13 @@
                             I undertake to use the flat for residential purposes only and will not sublet or change the use without prior written permission from the Association.
                         </p>
                         <p>
-                            I agree to follow all the rules and regulations of the Association and maintain the property in good condition.
+                            I/We, <b>{data.owners.filter(owner => owner.name && owner.name.trim()).map((owner, index) =>
+                                `${owner.title || "Mr"} ${owner.name}${index < data.owners.filter(o => o.name && o.name.trim()).length - 1 ? ', ' : ''}`
+                            ).join('')} </b>residing at <b>{data.block && data.flatNo ? `${data.block} ${data.flatNo}` : '_____'}</b> as tenant(s), hereby agree to abide by the rules and regulations of the Association, as currently in force and as may be amended from time to time.
+                            <br/>
+                            I/We confirm that we have read and understood these rules and regulations, and accept that the Association is empowered to take appropriate action against me/us in the event of any violation.
+                            <br/>
+                            Furthermore, I/We undertake to pay all maintenance charges on time. In case of default, I/We acknowledge and accept that the Association reserves the right to initiate necessary action for recovery.
                         </p>
                         <p>
                             I understand that this tenancy is subject to the approval of the Association and all applicable laws.
