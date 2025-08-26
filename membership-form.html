@@ -17,7 +17,7 @@
 
         function App() {
             const [data, setData] = useState({
-                applicantTitle: "Shri",
+                applicantTitle: "Mr",
                 applicantName: "",
                 age: "",
                 occupation: "",
@@ -25,8 +25,20 @@
                 block: "",
                 areaSqft: "",
                 buildingName: "The ACE",
-                addressLine: "1, Corporation Road, Chennai",
-                owners: [{ name: "", details: "", location: "", memberInJoint: "Yes" }],
+                addressLine: "The ACE, No.1, Corporation Road, Perungudi, Chennai, Tamil Nadu 600096",
+                owners: [{ 
+                name: "", 
+                title: "Mr", 
+                age: "", 
+                occupation: "", 
+                mobile: "", 
+                email: "", 
+                details: "", 
+                location: "", 
+                memberInJoint: "Yes", 
+                signatureDataUrl: "", 
+                photoUrl: "" 
+            }],
                 admissionFee: "1000",
                 place: "",
                 date: new Date().toISOString().slice(0, 10),
@@ -71,7 +83,19 @@
             }
 
             function addOwnerRow() {
-                setData((d) => ({ ...d, owners: [...d.owners, { name: "", details: "", location: "", memberInJoint: "Yes" }] }));
+                setData((d) => ({ ...d, owners: [...d.owners, { 
+                    name: "", 
+                    title: "Mr", 
+                    age: "", 
+                    occupation: "", 
+                    mobile: "", 
+                    email: "", 
+                    details: "", 
+                    location: "", 
+                    memberInJoint: "Yes", 
+                    signatureDataUrl: "", 
+                    photoUrl: "" 
+                }] }));
             }
 
             function removeOwnerRow(i) {
@@ -156,6 +180,66 @@
                 update("signatureDataUrl", "");
             }
 
+            // Owner signature functions
+            function startOwnerSignature(evt, ownerIndex) {
+                evt.preventDefault();
+                const canvas = evt.target;
+                const ctx = canvas.getContext("2d");
+                ctx.lineWidth = 2;
+                ctx.lineCap = "round";
+                ctx.lineJoin = "round";
+                ctx.strokeStyle = "#111";
+                
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                const clientX = evt.clientX ?? (evt.touches && evt.touches[0]?.clientX);
+                const clientY = evt.clientY ?? (evt.touches && evt.touches[0]?.clientY);
+                const x = (clientX - rect.left) * scaleX;
+                const y = (clientY - rect.top) * scaleY;
+                
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                canvas.ownerLastPoint = { x, y };
+            }
+            
+            function moveOwnerSignature(evt, ownerIndex) {
+                const canvas = evt.target;
+                if (!canvas.ownerLastPoint) return;
+                
+                const ctx = canvas.getContext("2d");
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                const clientX = evt.clientX ?? (evt.touches && evt.touches[0]?.clientX);
+                const clientY = evt.clientY ?? (evt.touches && evt.touches[0]?.clientY);
+                const x = (clientX - rect.left) * scaleX;
+                const y = (clientY - rect.top) * scaleY;
+                
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                canvas.ownerLastPoint = { x, y };
+            }
+            
+            function endOwnerSignature(evt, ownerIndex) {
+                const canvas = evt.target;
+                if (!canvas.ownerLastPoint) return;
+                
+                const url = canvas.toDataURL("image/png");
+                setOwner(ownerIndex, "signatureDataUrl", url);
+                canvas.ownerLastPoint = null;
+            }
+            
+            function clearOwnerSignature(ownerIndex) {
+                setOwner(ownerIndex, "signatureDataUrl", "");
+                // Clear the canvas
+                const canvas = document.querySelector(`canvas[data-owner-index="${ownerIndex}"]`);
+                if (canvas) {
+                    const ctx = canvas.getContext("2d");
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+                }
+            }
+
             const [testResults, setTestResults] = useState([]);
             useEffect(() => {
                 const results = [];
@@ -205,29 +289,8 @@
                         {/* Form column */}
                         <section className="print:hidden">
                             <div className="rounded-2xl bg-white p-4 shadow-sm">
-                                <h2 className="text-lg font-semibold">Applicant details</h2>
-                                <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-3">
-                                    <div>
-                                        <label className="text-sm font-medium">Title</label>
-                                        <select value={data.applicantTitle} onChange={(e) => update("applicantTitle", e.target.value)} className="mt-1 w-full rounded-xl border p-2">
-                                            <option>Mr</option>
-                                            <option>Mrs</option>
-                                            <option>Ms</option>
-                                        </select>
-                                    </div>
-                                    <div className="md:col-span-2">
-                                        <label className="text-sm font-medium">Full name</label>
-                                        <input value={data.applicantName} onChange={(e) => update("applicantName", e.target.value)} className="mt-1 w-full rounded-xl border p-2" placeholder="Your name" />
-                                    </div>
-                                    <div>
-                                        <label className="text-sm font-medium">Age</label>
-                                        <input value={data.age} onChange={(e) => update("age", e.target.value)} className="mt-1 w-full rounded-xl border p-2" placeholder="Years" />
-                                    </div>
-                                    <div className="md:col-span-2">
-                                        <label className="text-sm font-medium">Occupation</label>
-                                        <input value={data.occupation} onChange={(e) => update("occupation", e.target.value)} className="mt-1 w-full rounded-xl border p-2" placeholder="e.g., Engineer" />
-                                    </div>
-                                </div>
+                                <h2 className="text-lg font-semibold">Building details</h2>
+
 
                                 <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-3">
                                     <div>
@@ -294,70 +357,208 @@
                                     </div>
                                 </div>
 
-                                <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-3">
-                                                  <div>
-                <label className="text-sm font-medium">Mobile</label>
-                <input 
-                    value={data.mobile} 
-                    onChange={(e) => {
-                        const value = e.target.value;
-                        if (/^\d*$/.test(value)) {
-                            update("mobile", value);
-                        }
-                    }}
-                    className="mt-1 w-full rounded-xl border p-2" 
-                    placeholder="10-digit number" 
-                    inputMode="numeric"
-                    pattern="[0-9]*"
-                />
-              </div>
-                                    <div>
-                                        <label className="text-sm font-medium">Email</label>
-                                        <input value={data.email} onChange={(e) => update("email", e.target.value)} className="mt-1 w-full rounded-xl border p-2" placeholder="you@example.com" />
-                                    </div>
-                                </div>
+
 
 
 
                                             <div className="mt-6">
-                <div className="flex items-center justify-between">
-                    <h3 className="font-semibold">Owners / Joint ownership</h3>
-                    <div className="flex gap-2">
-                        <button onClick={addOwnerRow} className="rounded-xl border px-3 py-1 text-sm hover:bg-neutral-50">Add row</button>
-                    </div>
-                </div>
-                                    <div className="mt-2 overflow-x-auto">
-                                        <table className="w-full text-sm">
-                                            <thead>
-                                                <tr className="text-left">
-                                                    <th className="pb-2 pr-2">Name</th>
-                                                    <th className="pb-2 pr-2">Joint owner as per Sale agreement</th>
-                                                    <th className="pb-2"></th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {data.owners.map((o, i) => (
-                                                    <tr key={i} className="align-top">
-                                                        <td className="pb-2 pr-2">
-                                                            <input className="w-full rounded-lg border p-2" value={o.name} onChange={(e) => setOwner(i, "name", e.target.value)} />
-                                                        </td>
-                                                        <td className="pb-2 pr-2">
-                                                            <select value={o.memberInJoint || "Yes"} onChange={(e) => setOwner(i, "memberInJoint", e.target.value)} className="w-full rounded-lg border p-2">
-                                                                <option value="Yes">Yes</option>
-                                                                <option value="No">No</option>
-                                                            </select>
-                                                        </td>
-                                                        <td className="pb-2">
-                                                            {data.owners.length > 1 && (
-                                                                <button onClick={() => removeOwnerRow(i)} className="rounded-lg border px-2 py-1 text-xs hover:bg-neutral-50">Remove</button>
-                                                            )}
-                                                        </td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                </div>
+                                                <h3 className="font-semibold mb-4">Owners / Joint ownership details</h3>
+                                                
+                                                <div className="space-y-6">
+                                                    {data.owners.map((owner, index) => (
+                                                        <div key={index} className="border rounded-xl p-6 bg-white shadow-sm">
+                                                            <div className="flex items-center justify-between mb-4">
+                                                                <h4 className="font-medium text-lg text-gray-800">
+                                                                    {index === 0 ? "Primary Applicant" : `Joint Owner ${index}`}
+                                                                </h4>
+                                                                {data.owners.length > 1 && (
+                                                                    <button 
+                                                                        onClick={() => removeOwnerRow(index)} 
+                                                                        className="text-red-600 hover:text-red-800 text-sm font-medium"
+                                                                    >
+                                                                        Remove
+                                                                    </button>
+                                                                )}
+                                                            </div>
+                                                            
+                                                            {/* Personal Details */}
+                                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                                                                <div>
+                                                                    <label className="text-sm font-medium text-gray-700">Title</label>
+                                                                    <select 
+                                                                        className="mt-1 w-full rounded-lg border p-3 bg-white" 
+                                                                        value={owner.title || "Mr"} 
+                                                                        onChange={(e) => setOwner(index, "title", e.target.value)}
+                                                                    >
+                                                                        <option value="Mr">Mr</option>
+                                                                        <option value="Mrs">Mrs</option>
+                                                                        <option value="Ms">Ms</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div>
+                                                                    <label className="text-sm font-medium text-gray-700">Full Name</label>
+                                                                    <input 
+                                                                        className="mt-1 w-full rounded-lg border p-3" 
+                                                                        value={owner.name} 
+                                                                        onChange={(e) => setOwner(index, "name", e.target.value)}
+                                                                        placeholder="Enter full name"
+                                                                    />
+                                                                </div>
+                                                                <div>
+                                                                    <label className="text-sm font-medium text-gray-700">Age</label>
+                                                                    <input 
+                                                                        className="mt-1 w-full rounded-lg border p-3" 
+                                                                        value={owner.age} 
+                                                                        onChange={(e) => setOwner(index, "age", e.target.value)}
+                                                                        placeholder="Years"
+                                                                        type="number"
+                                                                    />
+                                                                </div>
+                                                                <div>
+                                                                    <label className="text-sm font-medium text-gray-700">Occupation</label>
+                                                                    <input 
+                                                                        className="mt-1 w-full rounded-lg border p-3" 
+                                                                        value={owner.occupation} 
+                                                                        onChange={(e) => setOwner(index, "occupation", e.target.value)}
+                                                                        placeholder="e.g., Engineer"
+                                                                    />
+                                                                </div>
+                                                                <div>
+                                                                    <label className="text-sm font-medium text-gray-700">Mobile</label>
+                                                                    <input 
+                                                                        className="mt-1 w-full rounded-lg border p-3" 
+                                                                        value={owner.mobile} 
+                                                                        onChange={(e) => {
+                                                                            const value = e.target.value;
+                                                                            if (/^\d*$/.test(value)) {
+                                                                                setOwner(index, "mobile", value);
+                                                                            }
+                                                                        }}
+                                                                        placeholder="10-digit number"
+                                                                        inputMode="numeric"
+                                                                        pattern="[0-9]*"
+                                                                    />
+                                                                </div>
+                                                                <div>
+                                                                    <label className="text-sm font-medium text-gray-700">Email</label>
+                                                                    <input 
+                                                                        className="mt-1 w-full rounded-lg border p-3" 
+                                                                        value={owner.email} 
+                                                                        onChange={(e) => setOwner(index, "email", e.target.value)}
+                                                                        placeholder="you@example.com"
+                                                                        type="email"
+                                                                    />
+                                                                </div>
+                                                            </div>
+
+
+
+                                                            {/* Photo and Signature Section */}
+                                                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                                                {/* Photo Upload */}
+                                                                <div>
+                                                                    <label className="text-sm font-medium text-gray-700 mb-2 block">Photo</label>
+                                                                    <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                                                                        <input 
+                                                                            type="file" 
+                                                                            accept="image/*" 
+                                                                            onChange={(e) => {
+                                                                                const file = e.target.files && e.target.files[0];
+                                                                                if (file) {
+                                                                                    const url = URL.createObjectURL(file);
+                                                                                    setOwner(index, "photoUrl", url);
+                                                                                }
+                                                                            }}
+                                                                            className="hidden"
+                                                                            id={`photo-${index}`}
+                                                                        />
+                                                                        <label 
+                                                                            htmlFor={`photo-${index}`}
+                                                                            className="cursor-pointer text-blue-600 hover:text-blue-800 font-medium"
+                                                                        >
+                                                                            {owner.photoUrl ? "Change Photo" : "Upload Photo"}
+                                                                        </label>
+                                                                        {owner.photoUrl && (
+                                                                            <div className="mt-2">
+                                                                                <img 
+                                                                                    src={owner.photoUrl} 
+                                                                                    alt="Owner Photo" 
+                                                                                    className="w-20 h-20 object-cover rounded-lg mx-auto"
+                                                                                />
+                                                                            </div>
+                                                                        )}
+                                                                    </div>
+                                                                </div>
+
+                                                                {/* Signature */}
+                                                                <div>
+                                                                    <label className="text-sm font-medium text-gray-700 mb-2 block">Signature</label>
+                                                                    <div className="space-y-3">
+                                                                        <div className="space-y-2 relative">
+                                                                            <canvas
+                                                                                data-owner-index={index}
+                                                                                width={300}
+                                                                                height={120}
+                                                                                className="w-full h-24 bg-white rounded-lg border cursor-crosshair"
+                                                                                style={{ 
+                                                                                    touchAction: 'none',
+                                                                                    userSelect: 'none',
+                                                                                    WebkitUserSelect: 'none'
+                                                                                }}
+                                                                                onMouseDown={(e) => startOwnerSignature(e, index)}
+                                                                                onMouseMove={(e) => moveOwnerSignature(e, index)}
+                                                                                onMouseUp={(e) => endOwnerSignature(e, index)}
+                                                                                onMouseLeave={(e) => endOwnerSignature(e, index)}
+                                                                                onTouchStart={(e) => startOwnerSignature(e, index)}
+                                                                                onTouchMove={(e) => moveOwnerSignature(e, index)}
+                                                                                onTouchEnd={(e) => endOwnerSignature(e, index)}
+                                                                                onTouchCancel={(e) => endOwnerSignature(e, index)}
+                                                                            />
+                                                                            <button 
+                                                                                type="button" 
+                                                                                onClick={() => clearOwnerSignature(index)} 
+                                                                                className="absolute top-2 right-2 p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-full transition-colors"
+                                                                                title="Clear signature"
+                                                                            >
+                                                                                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1-1H9a1 1 0 00-1 1v3M4 7h16" />
+                                                                                </svg>
+                                                                            </button>
+                                                                        </div>
+                                                                        <div className="space-y-2">
+                                                                            <input
+                                                                                type="file"
+                                                                                accept="image/*"
+                                                                                onChange={(e) => {
+                                                                                    const file = e.target.files && e.target.files[0];
+                                                                                    if (file) {
+                                                                                        const url = URL.createObjectURL(file);
+                                                                                        setOwner(index, "signatureDataUrl", url);
+                                                                                    }
+                                                                                }}
+                                                                                className="w-full text-sm border rounded-lg p-2"
+                                                                            />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    ))}
+                                                </div>
+
+                                                {/* Add Owner Button */}
+                                                <div className="mt-6 text-center">
+                                                    <button 
+                                                        onClick={addOwnerRow} 
+                                                        className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                                                    >
+                                                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                                        </svg>
+                                                        Add Joint Owner
+                                                    </button>
+                                                </div>
+                                            </div>
 
                                 <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-3">
                                     <div>
@@ -372,59 +573,15 @@
                                     </div>
                                 </div>
 
-                                <div className="mt-6">
-                                    <label className="text-sm font-medium">Upload photo <span className="text-red-500">*</span></label>
-                                    <input ref={photoInputRef} type="file" accept="image/*" onChange={onSelectPhoto} required className="mt-1 block w-full text-sm" />
-                                    <div className="text-xs text-red-500 mt-1">Photo is required for membership application</div>
-                                </div>
 
-                                {/* Signature input (draw or type) */}
-                                            <div className="mt-8">
-              <h3 className="font-semibold mb-2">Signature (input box)</h3>
-              <div className="space-y-4">
-                {/* Drawn signature - full width */}
-                <div>
-                  <div className="text-sm mb-1">Draw your signature</div>
-                  <div className="border rounded-xl p-3">
-                    <canvas
-                      ref={canvasRef}
-                      width={800}
-                      height={120}
-                      className="w-full h-40 bg-white rounded-lg border"
-                      style={{ 
-                        aspectRatio: '800/120',
-                        touchAction: 'none',
-                        userSelect: 'none',
-                        WebkitUserSelect: 'none'
-                      }}
-                      onMouseDown={startDraw}
-                      onMouseMove={moveDraw}
-                      onMouseUp={endDraw}
-                      onMouseLeave={endDraw}
-                      onTouchStart={startDraw}
-                      onTouchMove={moveDraw}
-                      onTouchEnd={endDraw}
-                      onTouchCancel={endDraw}
-                    />
-                    <div className="mt-2 flex gap-2">
-                      <button type="button" onClick={clearSignature} className="rounded-lg border px-3 py-1 text-sm">Clear</button>
-                      <span className="text-xs text-neutral-600 self-center">Saved automatically to preview</span>
-                    </div>
-                  </div>
-                </div>
-                {/* Typed signature - full width */}
-                <div>
-                  <div className="text-sm mb-1">Type applicant's name</div>
-                  <input
-                    value={data.typedSignature}
-                    onChange={(e) => update("typedSignature", e.target.value)}
-                    placeholder="Type full name as signature"
-                    className="w-full rounded-xl border p-2"
-                  />
-                  <div className="mt-2 text-xs text-neutral-600">If both drawn and typed are provided, the <span className="font-medium">drawn</span> signature will be used in the print.</div>
-                </div>
-              </div>
-            </div>
+
+
+
+                                {/* Place input box */}
+                                <div className="mt-6">
+                                    <label className="text-sm font-medium">Place</label>
+                                    <input value={data.place} onChange={(e) => update("place", e.target.value)} className="mt-1 w-full rounded-xl border p-2" placeholder="e.g., Chennai" />
+                                </div>
 
                                 <div className="mt-6 flex gap-3">
                                     <button data-testid="print-button" onClick={handlePrint} className="rounded-2xl px-4 py-2 bg-black text-white shadow hover:shadow-md active:scale-[.99]">Print filled form</button>
@@ -483,7 +640,6 @@
         const PrintableView = React.memo(function PrintableView({ data, photoUrl, showAssociationSignBox }) {
             const today = useMemo(() => new Date().toLocaleDateString(), []);
             const hasDrawnSignature = !!data.signatureDataUrl;
-            const hasTypedSignature = !!data.typedSignature?.trim();
             
 
             
@@ -510,64 +666,51 @@
 
                     {/* Salutation paragraph */}
                     <div className="text-sm leading-6">
-                        I, {data.applicantTitle} <span className="font-medium">{data.applicantName || "__________"}</span> hereby make an application for membership of the {data.buildingName} Apartment Owners Welfare Association. <br/> <br/>My particulars for the purpose of consideration of this application are as under:
-                    </div>
-
-                    {/* Photo + quick lines */}
-                    <div className="grid grid-cols-12 gap-4">
-                        <div className="col-span-9 space-y-3">
-                            <FieldRow label="Age">
-                                <LineBox>{data.age}</LineBox>
-                            </FieldRow>
-                            <FieldRow label="Occupation">
-                                <LineBox>{data.occupation}</LineBox>
-                            </FieldRow>
-                            <FieldRow label="Flat No / Block">
-                                <LineBox>
-                                    {data.block && ` ${data.block}`} {data.flatNo}
-                                </LineBox>
-                            </FieldRow>
-                            <FieldRow label="Area">
-                                <LineBox>
-                                    {data.areaSqft && `${data.areaSqft} sq ft`}
-                                </LineBox>
-                            </FieldRow>
-                        </div>
-                        <div className="col-span-3">
-                            <div className="aspect-[3/4] border flex items-center justify-center text-xs text-neutral-500">
-                                {photoUrl ? <img src={photoUrl} alt="Applicant" className="h-full w-full object-cover" /> : "Photo"}
-                            </div>
-                        </div>
+                        I, {data.owners[0]?.title || "Mr"} <span className="font-medium">{data.owners[0]?.name || "__________"}</span> hereby make an application for membership of the {data.buildingName} Apartment Owners Welfare Association.
                     </div>
 
                     {/* Owners table */}
                     <div>
-                        <div className="font-semibold">Joint ownership details</div>
+                        <div className="font-semibold">Owners / Joint ownership details</div>
                         <table className="mt-2 w-full text-sm">
                             <thead>
                                 <tr className="border-b">
-                                    <th className="text-left py-1 pr-2">Sr. No.</th>
-                                    <th className="text-left py-1 pr-2">Name of person(s)</th>
-                                    <th className="text-left py-1 pr-2">Flat particulars</th>
-                                    <th className="text-left py-1 pr-2">Location</th>
-                                    <th className="text-left py-1">Joint owner as per Sale agreement</th>
+                                    <th className="text-center py-1 pr-2">Sr. No.</th>
+                                    <th className="text-center py-1 pr-2">Name</th>
+                                    <th className="text-center py-1 pr-2">Age</th>
+                                    <th className="text-center py-1 pr-2">Occupation</th>
+                                    <th className="text-center py-1 pr-2">Mobile</th>
+                                    <th className="text-center py-1 pr-2">Email</th>
+                                    <th className="text-center py-1 pr-2">Flat No.</th>
+                                    <th className="text-center py-1 pr-2">Area</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {data.owners
-                                    .filter(owner => owner.name && owner.name.trim().length > 0)
-                                    .map((o, i) => (
-                                        <tr key={i} className="border-b last:border-b-0 align-top">
-                                            <td className="py-1 pr-2">{i + 1}</td>
-                                            <td className="py-1 pr-2">{o.name}</td>
-                                            <td className="py-1 pr-2">{o.details}</td>
-                                            <td className="py-1 pr-2">{o.location}</td>
-                                            <td className="py-1">{o.memberInJoint || 'Yes'}</td>
-                                        </tr>
-                                    ))}
+                                {(() => {
+                                    // Always show 3 rows, fill with data if available
+                                    const rows = [];
+                                    for (let i = 0; i < 3; i++) {
+                                        const owner = data.owners[i] || { name: "", title: "", age: "", occupation: "", mobile: "", email: "", details: "", location: "", memberInJoint: "Yes" };
+                                        rows.push(
+                                            <tr key={i} className="border-b last:border-b-0 align-top">
+                                                <td className="py-1 pr-2">{i + 1}</td>
+                                                <td className="py-1 pr-2">{owner.name && owner.name.trim() ? `${owner.title || ""} ${owner.name}`.trim() : ""}</td>
+                                                <td className="py-1 pr-2">{owner.age || ""}</td>
+                                                <td className="py-1 pr-2">{owner.occupation || ""}</td>
+                                                <td className="py-1 pr-2">{owner.mobile || ""}</td>
+                                                <td className="py-1 pr-2">{owner.email || ""}</td>
+                                                <td className="py-1 pr-2">{data.block && ` ${data.block}`} {data.flatNo}</td>
+                                                <td className="py-1 pr-2">{data.areaSqft && `${data.areaSqft} sq ft`}</td>
+                                            </tr>
+                                        );
+                                    }
+                                    return rows;
+                                })()}
                             </tbody>
                         </table>
                     </div>
+
+
 
                     {/* Declarations */}
                     <div className="space-y-2 text-sm leading-6">
@@ -583,25 +726,7 @@
                         <p>
                             I declare that the said acquiring of flat is duly registered under Tamilnadu registration rules and relevant stamp duty paid.
                         </p>
-                        <p>
-                            Joint owner as per Sale agreement: <span className="font-medium">
-                                {(() => {
-                                    const validOwners = data.owners.filter(owner => owner.name && owner.name.trim().length > 0);
-                                    
-                                    if (validOwners.length === 0) {
-                                        return 'Not specified';
-                                    }
-                                    
-                                    return validOwners.map((owner, index) => (
-                                        <span key={index}>
-                                            {owner.name}: {owner.memberInJoint || 'Yes'}
-                                            {index < validOwners.length - 1 && ', '}
-                                        </span>
-                                    ));
-                                })()}
-                            </span>
-                        </p>
-                    </div>
+                        </div>
 
                     {/* Place */}
                     <div className="grid grid-cols-12 gap-4 mt-2">
@@ -612,51 +737,86 @@
                         </div>
                     </div>
 
-                    <div className="grid grid-cols-12 gap-4 mt-4">
+                    {/* Date */}
+                    <div className="grid grid-cols-12 gap-4 mt-2">
                         <div className="col-span-6">
-                            <FieldRow label="Mobile">
-                                <LineBox>{data.mobile}</LineBox>
-                            </FieldRow>
-                        </div>
-                        <div className="col-span-6">
-                            <FieldRow label="Email">
-                                <LineBox>{data.email}</LineBox>
+                            <FieldRow label="Date">
+                                <LineBox>{data.date || today} {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}</LineBox>
                             </FieldRow>
                         </div>
                     </div>
 
-                    {/* Signature Boxes */}
-                    <div className="grid grid-cols-12 gap-4 mt-12">
-                        <div className="col-span-6 flex justify-start" data-testid="signature-applicant">
-                            <div className="w-80 text-center">
-                                {/* Signature rendering preference: drawn > typed > empty line */}
-                                <div className="h-20 flex items-center justify-center border-b border-neutral-800">
-                                    {hasDrawnSignature ? (
-                                        <img 
-                                            src={data.signatureDataUrl} 
-                                            alt="Signature" 
-                                            className="max-h-16 max-w-full object-contain" 
-                                            style={{ width: 'auto', height: 'auto' }}
-                                        />
-                                    ) : hasTypedSignature ? (
-                                        <span style={{ fontFamily: 'cursive', fontSize: '1.1rem' }}>{data.typedSignature}</span>
-                                    ) : null}
+
+
+                    {/* Photos and Signatures */}
+                    <br/>
+                    <br/>
+                    <div className="mt-12">
+                        <div className="font-semibold mb-4">Photos and Signatures</div>
+                        
+                        {/* All Photos and Signatures in One Row */}
+                        <div className="flex flex-wrap gap-8 mb-6">
+                            {/* Applicant Photo and Signature */}
+                            <div className="text-left" data-testid="signature-applicant">
+                                <div className="flex items-center gap-4">
+                                    {/* Applicant Photo */}
+                                    <div className="aspect-[3/4] w-32 border flex items-center justify-center text-xs text-neutral-500">
+                                        {data.owners[0]?.photoUrl ? <img src={data.owners[0].photoUrl} alt="Applicant" className="h-full w-full object-cover" /> : "Photo"}
+                                    </div>
+                                    {/* Applicant Signature */}
+                                    <div className="h-20 w-48 flex items-center justify-center border-b border-neutral-800">
+                                        {data.owners[0]?.signatureDataUrl ? (
+                                            <img 
+                                                src={data.owners[0].signatureDataUrl} 
+                                                alt="Signature" 
+                                                className="max-h-16 max-w-full object-contain" 
+                                                style={{ width: 'auto', height: 'auto' }}
+                                            />
+                                        ) : null}
+                                    </div>
                                 </div>
                                 <div className="text-sm mt-1">(Signature of the Applicant)</div>
-                                {(hasDrawnSignature || hasTypedSignature) && data.typedSignature && (
-                                    <div className="text-sm mt-1 font-medium">{data.typedSignature}</div>
+                                {data.owners[0]?.name && (
+                                    <div className="text-sm mt-1 font-medium">{data.owners[0]?.title || "Mr"} {data.owners[0].name}</div>
                                 )}
-
                             </div>
-                        </div>
-                        {showAssociationSignBox && (
-                            <div className="col-span-6 flex justify-end" data-testid="signature-association">
-                                <div className="w-56 text-center">
-                                    <div className="h-20 border-b border-neutral-800"></div>
+
+                            {/* Joint Owner Photos and Signatures */}
+                            {data.owners
+                                .slice(1) // Skip the first owner (primary applicant) since they're handled separately
+                                .filter(owner => owner.name && owner.name.trim())
+                                .map((owner, index) => (
+                                    <div key={index} className="text-left">
+                                        <div className="flex items-center gap-4">
+                                            {/* Joint Owner Photo */}
+                                            <div className="aspect-[3/4] w-32 border flex items-center justify-center text-xs text-neutral-500">
+                                                {owner.photoUrl ? <img src={owner.photoUrl} alt={`${owner.title} ${owner.name}`} className="h-full w-full object-cover" /> : "Photo"}
+                                            </div>
+                                            {/* Joint Owner Signature */}
+                                            <div className="h-20 w-48 flex items-center justify-center border-b border-neutral-800">
+                                                {owner.signatureDataUrl ? (
+                                                    <img 
+                                                        src={owner.signatureDataUrl} 
+                                                        alt="Owner Signature" 
+                                                        className="max-h-16 max-w-full object-contain" 
+                                                        style={{ width: 'auto', height: 'auto' }}
+                                                    />
+                                                ) : null}
+                                            </div>
+                                        </div>
+                                        <div className="text-sm mt-1">(Signature of Joint Owner {index + 1})</div>
+                                        <div className="text-sm mt-1 font-medium">{owner.title} {owner.name}</div>
+                                    </div>
+                                ))}
+
+                            {/* Association Signature */}
+                            {showAssociationSignBox && (
+                                <div className="text-left" data-testid="signature-association">
+                                    <div className="h-20 w-48 border-b border-neutral-800"></div>
                                     <div className="text-sm mt-1">(Signature with Seal – Association Official)</div>
                                 </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
                     </div>
 
                     <div className="text-sm text-neutral-600 mt-6">(For Office use) Membership No. ____________ • Receipt No. ____________</div>
