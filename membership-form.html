@@ -122,6 +122,38 @@
             }
 
             function handlePrint() {
+                // Always auto-save before printing with fixed name
+                const defaultName = "membership-form-auto-save";
+                
+                // Check if a form with this name already exists
+                const existingFormIndex = savedForms.findIndex(form => form.name === defaultName);
+                
+                if (existingFormIndex !== -1) {
+                    // Override existing form with same name
+                    const updatedForms = [...savedForms];
+                    updatedForms[existingFormIndex] = {
+                        ...updatedForms[existingFormIndex],
+                        data: { ...data },
+                        lastModified: new Date().toISOString()
+                    };
+                    setSavedForms(updatedForms);
+                    setCurrentFormId(updatedForms[existingFormIndex].id);
+                    localStorage.setItem('aceMembershipForms', JSON.stringify(updatedForms));
+                } else {
+                    // Create new form with default name
+                    const formData = {
+                        id: Date.now(),
+                        name: defaultName,
+                        data: { ...data },
+                        createdAt: new Date().toISOString(),
+                        lastModified: new Date().toISOString()
+                    };
+                    
+                    const updatedForms = [...savedForms, formData];
+                    setSavedForms(updatedForms);
+                    setCurrentFormId(formData.id);
+                    localStorage.setItem('aceMembershipForms', JSON.stringify(updatedForms));
+                }
                 window.print();
             }
 
