@@ -51,6 +51,7 @@
             });
 
             const [showAssociationSignBox, setShowAssociationSignBox] = useState(false);
+            const [showFAQ, setShowFAQ] = useState(false);
             const photoInputRef = useRef(null);
             const [photoUrl, setPhotoUrl] = useState("");
 
@@ -117,11 +118,46 @@
             function onSelectPhoto(e) {
                 const file = e.target.files && e.target.files[0];
                 if (!file) return;
-                const url = URL.createObjectURL(file);
-                setPhotoUrl(url);
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    setPhotoUrl(e.target.result);
+                };
+                reader.readAsDataURL(file);
             }
 
             function handlePrint() {
+                // Always auto-save before printing with fixed name
+                const defaultName = "membership-form-auto-save";
+                
+                // Check if a form with this name already exists
+                const existingFormIndex = savedForms.findIndex(form => form.name === defaultName);
+                
+                if (existingFormIndex !== -1) {
+                    // Override existing form with same name
+                    const updatedForms = [...savedForms];
+                    updatedForms[existingFormIndex] = {
+                        ...updatedForms[existingFormIndex],
+                        data: { ...data },
+                        lastModified: new Date().toISOString()
+                    };
+                    setSavedForms(updatedForms);
+                    setCurrentFormId(updatedForms[existingFormIndex].id);
+                    localStorage.setItem('aceMembershipForms', JSON.stringify(updatedForms));
+                } else {
+                    // Create new form with default name
+                    const formData = {
+                        id: Date.now(),
+                        name: defaultName,
+                        data: { ...data },
+                        createdAt: new Date().toISOString(),
+                        lastModified: new Date().toISOString()
+                    };
+                    
+                    const updatedForms = [...savedForms, formData];
+                    setSavedForms(updatedForms);
+                    setCurrentFormId(formData.id);
+                    localStorage.setItem('aceMembershipForms', JSON.stringify(updatedForms));
+                }
                 window.print();
             }
 
@@ -287,7 +323,6 @@
                 localStorage.setItem('aceMembershipForms', JSON.stringify(updatedForms));
                 
                 console.log('Form saved successfully');
-                alert(`Form "${formName}" saved successfully!`);
             }
 
             // Auto-save function
@@ -307,19 +342,16 @@
             function loadForm(formId) {
                 const form = savedForms.find(f => f.id === formId);
                 if (form) {
-                    if (confirm(`Load form "${form.name}"? This will replace your current form data.`)) {
-                        setData({ ...form.data });
-                        setCurrentFormId(formId);
-                        setShowSavedForms(false);
-                        alert(`Form "${form.name}" loaded successfully!`);
-                    }
+                    setData({ ...form.data });
+                    setCurrentFormId(formId);
+                    setShowSavedForms(false);
                 }
             }
 
             // Delete a saved form
             function deleteForm(formId) {
                 const form = savedForms.find(f => f.id === formId);
-                if (form && confirm(`Delete form "${form.name}"? This action cannot be undone.`)) {
+                if (form) {
                     const updatedForms = savedForms.filter(f => f.id !== formId);
                     setSavedForms(updatedForms);
                     if (currentFormId === formId) {
@@ -572,13 +604,16 @@
                                                                         <input 
                                                                             type="file" 
                                                                             accept="image/*" 
-                                                                            onChange={(e) => {
-                                                                                const file = e.target.files && e.target.files[0];
-                                                                                if (file) {
-                                                                                    const url = URL.createObjectURL(file);
-                                                                                    setOwner(index, "photoUrl", url);
-                                                                                }
-                                                                            }}
+                                                                                                                                            onChange={(e) => {
+                                                                    const file = e.target.files && e.target.files[0];
+                                                                    if (file) {
+                                                                        const reader = new FileReader();
+                                                                        reader.onload = (e) => {
+                                                                            setOwner(index, "photoUrl", e.target.result);
+                                                                        };
+                                                                        reader.readAsDataURL(file);
+                                                                    }
+                                                                }}
                                                                             className="hidden"
                                                                             id={`photo-${index}`}
                                                                         />
@@ -639,13 +674,16 @@
                                                                             <input
                                                                                 type="file"
                                                                                 accept="image/*"
-                                                                                onChange={(e) => {
-                                                                                    const file = e.target.files && e.target.files[0];
-                                                                                    if (file) {
-                                                                                        const url = URL.createObjectURL(file);
-                                                                                        setOwner(index, "signatureDataUrl", url);
-                                                                                    }
-                                                                                }}
+                                                                                                                                                        onChange={(e) => {
+                                                                            const file = e.target.files && e.target.files[0];
+                                                                            if (file) {
+                                                                                const reader = new FileReader();
+                                                                                reader.onload = (e) => {
+                                                                                    setOwner(index, "signatureDataUrl", e.target.result);
+                                                                                };
+                                                                                reader.readAsDataURL(file);
+                                                                            }
+                                                                        }}
                                                                                 className="w-full text-sm border rounded-lg p-2"
                                                                             />
                                                                         </div>
@@ -784,6 +822,189 @@
                                     <button 
                                         onClick={() => setShowSavedForms(false)}
                                         className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                                    >
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* FAQ Modal */}
+                    <div className="fixed bottom-4 right-4 z-40">
+                        <button 
+                            onClick={() => setShowFAQ(!showFAQ)} 
+                            className="bg-blue-600 text-white px-4 py-3 rounded-full shadow-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                            title="Frequently Asked Questions"
+                        >
+                            <span className="font-medium text-sm">FAQ</span>
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    {showFAQ && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                            <div className="bg-white rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                                <div className="flex items-center justify-between mb-6">
+                                    <h3 className="text-2xl font-bold text-gray-800">Frequently Asked Questions - Membership Form</h3>
+                                    <button 
+                                        onClick={() => setShowFAQ(false)}
+                                        className="text-gray-500 hover:text-gray-700 text-3xl"
+                                    >
+                                        ×
+                                    </button>
+                                </div>
+                                
+                                <div className="space-y-6">
+                                    {/* FAQ 1 */}
+                                    <div className="border-l-4 border-blue-500 pl-4">
+                                        <h4 className="text-lg font-semibold text-gray-800 mb-2">
+                                            Why is the Association Membership Fee Collected at the Time of Registration?
+                                        </h4>
+                                        <div className="text-gray-700 space-y-3">
+                                            <p><strong>As per the TAAOWA Bye-laws:</strong></p>
+                                            <blockquote className="bg-gray-50 p-3 rounded-lg border-l-4 border-gray-300 italic">
+                                                "Upon the sale/gift/transfer/partition/release/settlement/exchange/sale certificate/attachment/judgement or bequest of an apartment, the purchaser/Title holder of the apartment/flat or the grantee or legatee or the transferee shall automatically become the Member of the Association and shall be admitted as Member on payment of the non-refundable admission fee of ₹1000/- (Rupees One Thousand only) excluding taxes, to TAAOWA."
+                                            </blockquote>
+                                            
+                                            <p><strong>In Simple Words:</strong></p>
+                                            <ul className="list-disc list-inside space-y-1 ml-4">
+                                                <li>Every flat/apartment must have its owner formally registered with the Association.</li>
+                                                <li>A one-time, non-refundable admission fee of ₹1000 (excluding taxes) is mandated by the bye-laws.</li>
+                                                <li>This ensures that all members are legally admitted into TAAOWA and eligible for their rights (voting, attending GBMs, availing association services).</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    {/* FAQ 2 */}
+                                    <div className="border-l-4 border-green-500 pl-4">
+                                        <h4 className="text-lg font-semibold text-gray-800 mb-2">
+                                            Benefits of Becoming a Registered Member of TAAOWA
+                                        </h4>
+                                        <div className="text-gray-700 space-y-3">
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                <div className="bg-blue-50 p-4 rounded-lg">
+                                                    <h5 className="font-semibold text-blue-800 mb-2">1️⃣ Legal Membership & Voting Rights</h5>
+                                                    <ul className="text-sm space-y-1">
+                                                        <li>• Official recognition as a member of the Association</li>
+                                                        <li>• Voting rights in General Body Meetings (GBMs) and decision-making</li>
+                                                    </ul>
+                                                </div>
+                                                <div className="bg-green-50 p-4 rounded-lg">
+                                                    <h5 className="font-semibold text-green-800 mb-2">2️⃣ Representation & Transparency</h5>
+                                                    <ul className="text-sm space-y-1">
+                                                        <li>• Ability to raise issues, suggest improvements, and influence policies</li>
+                                                        <li>• Access to minutes, budgets, and audited accounts for transparency</li>
+                                                    </ul>
+                                                </div>
+                                                <div className="bg-purple-50 p-4 rounded-lg">
+                                                    <h5 className="font-semibold text-purple-800 mb-2">3️⃣ Property Value & Reputation</h5>
+                                                    <ul className="text-sm space-y-1">
+                                                        <li>• Well-managed societies preserve higher property values</li>
+                                                        <li>• Buyers prefer apartments with clear governance & records</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* FAQ 3 */}
+                                    <div className="border-l-4 border-purple-500 pl-4">
+                                        <h4 className="text-lg font-semibold text-gray-800 mb-2">
+                                            Fee Structure & Practices in Associations
+                                        </h4>
+                                        <div className="text-gray-700 space-y-3">
+                                            <div className="space-y-3">
+                                                <div className="bg-yellow-50 p-3 rounded-lg">
+                                                    <h5 className="font-semibold text-yellow-800">🔹 One-time Admission Fee (like TAAOWA's ₹1000)</h5>
+                                                    <ul className="text-sm space-y-1 ml-4">
+                                                        <li>• A standard practice across housing societies</li>
+                                                        <li>• Ranges between ₹500 – ₹5000, depending on size & bye-laws</li>
+                                                        <li>• Collected when a flat is first occupied, transferred, or sold</li>
+                                                        <li>• Covers legal, administrative & registration costs</li>
+                                                    </ul>
+                                                </div>
+                                                <div className="bg-blue-50 p-3 rounded-lg">
+                                                    <h5 className="font-semibold text-blue-800">🔹 Annual Subscription / Maintenance</h5>
+                                                    <ul className="text-sm space-y-1 ml-4">
+                                                        <li>• Separate from admission fee</li>
+                                                        <li>• Paid monthly/quarterly for operations: housekeeping, security, utilities</li>
+                                                    </ul>
+                                                </div>
+                                                <div className="bg-green-50 p-3 rounded-lg">
+                                                    <h5 className="font-semibold text-green-800">🔹 Transfer of Membership</h5>
+                                                    <ul className="text-sm space-y-1 ml-4">
+                                                        <li>• When a flat is sold/transferred, the new owner pays the admission fee to become a member</li>
+                                                        <li>• Old membership automatically ceases</li>
+                                                    </ul>
+                                                </div>
+                                                <div className="bg-purple-50 p-3 rounded-lg">
+                                                    <h5 className="font-semibold text-purple-800">🔹 Tenants / Lessees</h5>
+                                                    <ul className="text-sm space-y-1 ml-4">
+                                                        <li>• Tenants are not members; they are registered occupants</li>
+                                                        <li>• No voting rights</li>
+                                                        <li>• Associations may charge move-in/out fees or refundable deposits for facility use</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* FAQ 4 - Important Documents */}
+                                    <div className="border-l-4 border-red-500 pl-4">
+                                        <h4 className="text-lg font-semibold text-gray-800 mb-2">
+                                            📋 Important Association Documents
+                                        </h4>
+                                        <div className="text-gray-700 space-y-3">
+                                            <p>Access official TAAOWA documents for complete information:</p>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                                                    <h5 className="font-semibold text-red-800 mb-2">🏛️ Association Registration Certificate</h5>
+                                                    <p className="text-sm text-gray-600 mb-3">Official registration certificate from the government authorities</p>
+                                                    <a 
+                                                        href="/public/documents/ACE- Association Registration Certificate.pdf" 
+                                                        target="_blank" 
+                                                        rel="noopener noreferrer"
+                                                        className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors"
+                                                    >
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                        </svg>
+                                                        View Certificate
+                                                    </a>
+                                                </div>
+                                                <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                                                    <h5 className="font-semibold text-blue-800 mb-2">📜 Bye-Laws & Members Signed</h5>
+                                                    <p className="text-sm text-gray-600 mb-3">Complete bye-laws document with member signatures</p>
+                                                    <a 
+                                                        href="/public/documents/Bye laws & Members signed.pdf" 
+                                                        target="_blank" 
+                                                        rel="noopener noreferrer"
+                                                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
+                                                    >
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                        </svg>
+                                                        View Bye-Laws
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <div className="bg-gray-50 p-3 rounded-lg">
+                                                <p className="text-sm text-gray-600">
+                                                    <strong>Note:</strong> These documents contain the official rules and regulations that govern TAAOWA. 
+                                                    All members are expected to follow these bye-laws and understand their rights and responsibilities.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div className="mt-6 text-center">
+                                    <button 
+                                        onClick={() => setShowFAQ(false)}
+                                        className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
                                     >
                                         Close
                                     </button>
