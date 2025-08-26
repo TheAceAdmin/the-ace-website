@@ -202,11 +202,16 @@
         color: #ffffff !important;
         border: 2px solid #000080 !important;
         transition: all 0.3s ease;
+        cursor: pointer !important;
+        padding: 8px 16px !important;
+        font-size: 14px !important;
       }
       
       .solid-button-button:hover {
         background-color: #000060 !important;
         border-color: #000060 !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       }
       
       /* Hero section text styling */
@@ -481,16 +486,14 @@
                     </button>
                   </a>
                 </div>
-                <a href="mailto:taaowa@aceapartment.org" class="landing-page-link10">
-                <solid-button-wrapper class="solid-button-wrapper">
+                <div class="solid-button-wrapper">
                   <!--SolidButton component-->
                   <div class="solid-button-container">
-                    <button class="solid-button-button button">
+                    <button class="solid-button-button button" onclick="window.location.href='mailto:taaowa@aceapartment.org'">
                       <span>Contact Us</span>
                     </button>
                   </div>
-                </solid-button-wrapper>
-              </a>
+                </div>
             </div>
             <div data-role="BurgerMenu" class="landing-page-burger-menu1">
               <svg viewBox="0 0 1024 1024" class="landing-page-burger-menu2">
@@ -551,194 +554,20 @@
               <h1 class="Heading landing-page-text15">
                 Celebrate. Live. Love. Together.
               </h1>
-              <h2 class="landing-page-subheading">At The ACE by Risland</h2>
+              <h2 class="landing-page-subheading">At The ACE</h2>
             </div>
           </div>
         </div>
-        <div class="landing-page-footer">
-          <div class="landing-page-menu">
-            <p>
-            <p><b>The Ace Apartment Owners Welfare Association (TAAOWA)</b></p></p>
+        <div class="landing-page-footer" style="text-align: center; width: 100%; margin: 0 auto; padding: 20px 0;">
+          <div style="max-width: 800px; margin: 0 auto;">
+            <p><b>The Ace Apartment Owners Welfare Association (TAAOWA)</b></p>
+            <p style="font-size: 0.9em; color: #666; margin-top: 5px;">(Reg. No.Chennai South/175/2025. Under TN Apartment Ownership Act 2022)</p>
           </div>
         </div>
     
-    <!-- RSVP Modal -->
-    <div id="rsvpModal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>RSVP for Independence Day</h2>
-          <span class="close" onclick="closeRSVPModal()">&times;</span>
-        </div>
-        <div class="modal-body">
-          <p class="modal-description">Provide your availability to plan the event at its best</p>
-          <form id="modalRsvpForm" class="modal-rsvp-form" onsubmit="submitModalRSVP(event)">
-            <div class="modal-form-group">
-              <label for="modalFlatNo">Flat No *</label>
-              <input type="text" id="modalFlatNo" name="flatno" placeholder="Flat No *" required class="modal-form-input" style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase()">
-            </div>
-            <div class="modal-form-group">
-              <label for="modalPersons">Persons</label>
-              <input type="number" id="modalPersons" name="persons" placeholder="Persons" min="1" class="modal-form-input">
-            </div>
-            <div class="modal-form-group">
-              <label for="modalAvailability">Availability *</label>
-              <select id="modalAvailability" name="availability" required class="modal-form-input">
-                <option value="">Select availability</option>
-                <option value="Available">Available</option>
-                <option value="Not Available">Not Available</option>
-                <option value="Tentative">Tentative</option>
-              </select>
-            </div>
-            <div class="modal-form-actions">
-              <button type="submit" class="modal-submit-button">
-                <span>Submit RSVP</span>
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+
     
-    <!-- Kids Activities Modal -->
-    <div id="kidsModal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>Kids Activities Registration</h2>
-          <span class="close" onclick="closeKidsModal()">&times;</span>
-        </div>
-        <div class="modal-body">
-          <form id="kidsModalForm" class="modal-rsvp-form" onsubmit="submitKidsModal(event)">
-            <div class="modal-form-group">
-              <label for="kidsFlatNo">Flat No *</label>
-              <input type="text" id="kidsFlatNo" name="flatno" placeholder="Flat No *" required class="modal-form-input" style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase()">
-            </div>
-            <div class="modal-form-group">
-              <label for="kidsChildName">Child Name *</label>
-              <input type="text" id="kidsChildName" name="childname" placeholder="Child Name *" required class="modal-form-input">
-            </div>
-            <div class="modal-form-group">
-              <label for="kidsAge">Age</label>
-              <input type="number" id="kidsAge" name="ag" placeholder="Age" class="modal-form-input" min="1" max="18">
-            </div>
-            <div class="modal-form-actions">
-              <button type="submit" class="modal-submit-button">
-                <span>Submit</span>
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Resident Games Modal -->
-    <div id="residentModal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>Resident Games Registration</h2>
-          <span class="close" onclick="closeResidentModal()">&times;</span>
-        </div>
-        <div class="modal-body">
-          <form id="residentModalForm" class="modal-rsvp-form" onsubmit="submitResidentModal(event)">
-            <div class="modal-form-group">
-              <label for="residentFlatNo">Flat No *</label>
-              <input type="text" id="residentFlatNo" name="flatno" placeholder="Flat No *" required class="modal-form-input" style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase()">
-            </div>
-            <div class="modal-form-group">
-              <label for="residentName">Name *</label>
-              <input type="text" id="residentName" name="name" placeholder="Name *" required class="modal-form-input">
-            </div>
-            <div class="modal-form-group">
-              <label for="residentAge">Age</label>
-              <input type="number" id="residentAge" name="age" placeholder="Age" class="modal-form-input" min="1" max="100">
-            </div>
-            <div class="modal-form-actions">
-              <button type="submit" class="modal-submit-button">
-                <span>Submit</span>
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Stalls and Play Zone Modal -->
-    <div id="stallsModal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>Stalls and Play Zone Registration</h2>
-          <span class="close" onclick="closeStallsModal()">&times;</span>
-        </div>
-        <div class="modal-body">
-          <form id="stallsModalForm" class="modal-rsvp-form" onsubmit="submitStallsModal(event)">
-            <div class="modal-form-group">
-              <label for="stallsFlatNo">Flat No *</label>
-              <input type="text" id="stallsFlatNo" name="flatno" placeholder="Flat No *" required class="modal-form-input" style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase()">
-            </div>
-            <div class="modal-form-group">
-              <label for="stallsStallType">Stall Type *</label>
-              <input type="text" id="stallsStallType" name="stalltype" placeholder="Stall Type *" required class="modal-form-input">
-            </div>
-            <div class="modal-form-group">
-              <label for="stallsPhone">Phone *</label>
-              <input type="tel" id="stallsPhone" name="phone" placeholder="Phone *" required class="modal-form-input">
-            </div>
-            <div class="modal-form-group">
-              <label for="stallsName">Name *</label>
-              <input type="text" id="stallsName" name="name" placeholder="Name *" required class="modal-form-input">
-            </div>
-            <div class="modal-form-group">
-              <div class="checkbox-container">
-                <input type="checkbox" id="stallsTerms" name="terms" required class="modal-checkbox">
-                <label for="stallsTerms" class="checkbox-label">
-                  I agree to the <a href="/stall-terms-and-conditions.html" target="_blank" class="terms-link">Terms & Conditions for Stall Participation</a> *
-                </label>
-              </div>
-            </div>
-            <div class="modal-form-actions">
-              <button type="submit" class="modal-submit-button">
-                <span>Submit</span>
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-    
-    <!-- Ideas and Activities Modal -->
-    <div id="ideasModal" class="modal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h2>Submit Your Ideas & Activities</h2>
-          <span class="close" onclick="closeIdeasModal()">&times;</span>
-        </div>
-        <div class="modal-body">
-          <p class="modal-description">Share your suggestions for additional activities like yoga, cultural performances, or special features to enhance our Independence Day celebration!</p>
-          <form id="ideasModalForm" class="modal-rsvp-form" onsubmit="submitIdeasModal(event)">
-            <div class="modal-form-group">
-              <label for="ideasFlatNo">Flat No *</label>
-              <input type="text" id="ideasFlatNo" name="flatno" placeholder="Flat No *" required class="modal-form-input" style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase()">
-            </div>
-            <div class="modal-form-group">
-              <label for="ideasActivity">Activity/Idea *</label>
-              <input type="text" id="ideasActivity" name="activity" placeholder="Describe your activity or idea (e.g., Yoga session, Cultural dance, Special performance, etc.)" required class="modal-form-input">
-            </div>
-            <div class="modal-form-group">
-              <label for="ideasPhone">Phone *</label>
-              <input type="tel" id="ideasPhone" name="phone" placeholder="Phone *" required class="modal-form-input">
-            </div>
-            <div class="modal-form-group">
-              <label for="ideasName">Name *</label>
-              <input type="text" id="ideasName" name="name" placeholder="Name *" required class="modal-form-input">
-            </div>
-            <div class="modal-form-actions">
-              <button type="submit" class="modal-submit-button">
-                <span>Submit Ideas</span>
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
+
     
     <script>
       // Mobile menu functionality
@@ -768,176 +597,13 @@
         });
       });
       
-      // Show RSVP modal on scroll (only if not submitted before)
-      let rsvpShown = false;
-      
-      // Check if RSVP was already submitted
-      function checkRSVPSubmitted() {
-        const rsvpSubmitted = localStorage.getItem('rsvpSubmitted');
-        return rsvpSubmitted === 'true';
-      }
-      
-      window.onscroll = function() {
-        if (!rsvpShown && !checkRSVPSubmitted()) {
-          const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-          const windowHeight = window.innerHeight;
-          const documentHeight = document.documentElement.scrollHeight;
-          
-          // Show RSVP modal when user scrolls 50% down the page
-          if (scrollTop > (documentHeight - windowHeight) * 0.5) {
-            openRSVPModal();
-            rsvpShown = true;
-          }
-        }
-      };
-      
-      function openRSVPModal() {
-        document.getElementById('rsvpModal').style.display = 'block';
-        document.body.style.overflow = 'hidden'; // Prevent background scrolling
-      }
-      
-      function closeRSVPModal() {
-        document.getElementById('rsvpModal').style.display = 'none';
-        document.body.style.overflow = 'auto'; // Restore scrolling
-      }
-      
-      // Close modal when clicking outside of it
-      window.onclick = function(event) {
-        const rsvpModal = document.getElementById('rsvpModal');
-        const kidsModal = document.getElementById('kidsModal');
-        const residentModal = document.getElementById('residentModal');
-        const stallsModal = document.getElementById('stallsModal');
-        const ideasModal = document.getElementById('ideasModal');
-        
-        if (event.target === rsvpModal) {
-          closeRSVPModal();
-        }
-        
-        if (event.target === kidsModal) {
-          closeKidsModal();
-        }
-        
-        if (event.target === residentModal) {
-          closeResidentModal();
-        }
-        
-        if (event.target === stallsModal) {
-          closeStallsModal();
-        }
-        
-        if (event.target === ideasModal) {
-          closeIdeasModal();
-        }
-      }
+
       
 
       
-      function submitModalRSVP(event) {
-        event.preventDefault();
-        
-        const form = document.getElementById('modalRsvpForm');
-        const formData = new FormData(form);
-        
-        // Get form values
-        const flatNo = formData.get('flatno');
-        const persons = formData.get('persons') || '1';
-        const availability = formData.get('availability');
-        
-        // Store RSVP submission status in localStorage
-        localStorage.setItem('rsvpSubmitted', 'true');
-        
-        // Create hidden form for submission
-        const hiddenForm = document.createElement('form');
-        hiddenForm.method = 'POST';
-        hiddenForm.action = 'https://docs.google.com/forms/d/e/1FAIpQLSeyryr7Ri66VVv79wlpZZBcBMIIYqrbiaBuinTi_iNHYTDj2g/formResponse';
-        hiddenForm.target = 'hidden-iframe-rsvp';
-        hiddenForm.style.display = 'none';
-        
-        // Add form fields
-        const fields = [
-          { name: 'entry.1481232661', value: flatNo },
-          { name: 'entry.1552579916', value: persons },
-          { name: 'entry.982127940', value: availability },
-          { name: 'submit', value: 'Submit' }
-        ];
-        
-        fields.forEach(field => {
-          const input = document.createElement('input');
-          input.type = 'hidden';
-          input.name = field.name;
-          input.value = field.value;
-          hiddenForm.appendChild(input);
-        });
-        
-        // Create hidden iframe
-        const iframe = document.createElement('iframe');
-        iframe.name = 'hidden-iframe-rsvp';
-        iframe.style.display = 'none';
-        document.body.appendChild(iframe);
-        document.body.appendChild(hiddenForm);
-        
-        // Submit form using native submit method
-        const submitButton = document.createElement('input');
-        submitButton.type = 'submit';
-        submitButton.style.display = 'none';
-        hiddenForm.appendChild(submitButton);
-        submitButton.click();
-        
-        // Clean up after submission
-        setTimeout(() => {
-          if (document.body.contains(hiddenForm)) {
-            document.body.removeChild(hiddenForm);
-          }
-          if (document.body.contains(iframe)) {
-            document.body.removeChild(iframe);
-          }
-        }, 2000);
-        
-        // Show success message in the modal
-        const modalBody = document.querySelector('#rsvpModal .modal-body');
-        modalBody.innerHTML = `
-          <div style="text-align: center; padding: 40px 20px;">
-            <div style="color: #28a745; font-size: 48px; margin-bottom: 20px;">✓</div>
-            <h3 style="color: #28a745; margin-bottom: 15px;">Submitted Successfully!</h3>
-            <p style="color: #666; font-size: 16px;">Your RSVP has been submitted successfully.</p>
-          </div>
-        `;
-        
-        // Close modal after 2 seconds
-        setTimeout(() => {
-          closeRSVPModal();
-          // Reset modal content for next use
-          setTimeout(() => {
-            modalBody.innerHTML = `
-              <p class="modal-description">Provide your availability to plan the event at its best</p>
-              <form id="modalRsvpForm" class="modal-rsvp-form" onsubmit="submitModalRSVP(event)">
-                <div class="modal-form-group">
-                  <label for="modalFlatNo">Flat No *</label>
-                  <input type="text" id="modalFlatNo" name="flatno" placeholder="Flat No *" required class="modal-form-input" style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase()">
-                </div>
-                <div class="modal-form-group">
-                  <label for="modalPersons">Persons</label>
-                  <input type="number" id="modalPersons" name="persons" placeholder="Persons" min="1" class="modal-form-input">
-                </div>
-                <div class="modal-form-group">
-                  <label for="modalAvailability">Availability *</label>
-                  <select id="modalAvailability" name="availability" required class="modal-form-input">
-                    <option value="">Select availability</option>
-                    <option value="Available">Available</option>
-                    <option value="Not Available">Not Available</option>
-                    <option value="Tentative">Tentative</option>
-                  </select>
-                </div>
-                <div class="modal-form-actions">
-                  <button type="submit" class="modal-submit-button">
-                    <span>Submit RSVP</span>
-                  </button>
-                </div>
-              </form>
-            `;
-          }, 500);
-        }, 2000);
-      }
+
+      
+
       
       function openKidsModal() {
         console.log('openKidsModal called');
