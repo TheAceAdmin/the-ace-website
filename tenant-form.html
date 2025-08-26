@@ -50,6 +50,7 @@
             });
 
             const [showAssociationSignBox, setShowAssociationSignBox] = React.useState(false);
+            const [showFAQ, setShowFAQ] = React.useState(false);
             const [savedForms, setSavedForms] = React.useState([]);
             const [showSavedForms, setShowSavedForms] = React.useState(false);
             const [currentFormId, setCurrentFormId] = React.useState(null);
@@ -96,7 +97,6 @@
                 localStorage.setItem('aceTenantForms', JSON.stringify(updatedForms));
                 
                 console.log('Form saved successfully');
-                alert(`Form "${formName}" saved successfully!`);
             }
 
             // Auto-save function
@@ -116,19 +116,16 @@
             function loadForm(formId) {
                 const form = savedForms.find(f => f.id === formId);
                 if (form) {
-                    if (confirm(`Load form "${form.name}"? This will replace your current form data.`)) {
-                        setData({ ...form.data });
-                        setCurrentFormId(formId);
-                        setShowSavedForms(false);
-                        alert(`Form "${form.name}" loaded successfully!`);
-                    }
+                    setData({ ...form.data });
+                    setCurrentFormId(formId);
+                    setShowSavedForms(false);
                 }
             }
 
             // Delete a saved form
             function deleteForm(formId) {
                 const form = savedForms.find(f => f.id === formId);
-                if (form && confirm(`Delete form "${form.name}"? This action cannot be undone.`)) {
+                if (form) {
                     const updatedForms = savedForms.filter(f => f.id !== formId);
                     setSavedForms(updatedForms);
                     if (currentFormId === formId) {
@@ -483,8 +480,11 @@
                                                                 onChange={(e) => {
                                                                     const file = e.target.files && e.target.files[0];
                                                                     if (file) {
-                                                                        const url = URL.createObjectURL(file);
-                                                                        setOwner(index, "photoUrl", url);
+                                                                        const reader = new FileReader();
+                                                                        reader.onload = (e) => {
+                                                                            setOwner(index, "photoUrl", e.target.result);
+                                                                        };
+                                                                        reader.readAsDataURL(file);
                                                                     }
                                                                 }}
                                                                 className="hidden"
@@ -547,13 +547,16 @@
                                                                 <input
                                                                     type="file"
                                                                     accept="image/*"
-                                                                    onChange={(e) => {
-                                                                        const file = e.target.files && e.target.files[0];
-                                                                        if (file) {
-                                                                            const url = URL.createObjectURL(file);
-                                                                            setOwner(index, "signatureDataUrl", url);
-                                                                        }
-                                                                    }}
+                                                                                                                                    onChange={(e) => {
+                                                                    const file = e.target.files && e.target.files[0];
+                                                                    if (file) {
+                                                                        const reader = new FileReader();
+                                                                        reader.onload = (e) => {
+                                                                            setOwner(index, "signatureDataUrl", e.target.result);
+                                                                        };
+                                                                        reader.readAsDataURL(file);
+                                                                    }
+                                                                }}
                                                                     className="w-full text-sm border rounded-lg p-2"
                                                                 />
                                                             </div>
@@ -633,7 +636,7 @@
                                             <div key={form.id} className="border rounded-lg p-4 hover:bg-gray-50">
                                                 <div className="flex items-center justify-between">
                                                     <div className="flex-1">
-                                                        <h4 className="font-medium text-gray-900">{form.name}</h4>
+                                                        <h4 className="text-lg font-semibold">{form.name}</h4>
                                                         <div className="text-sm text-gray-500 mt-1">
                                                             <span>Created: {new Date(form.createdAt).toLocaleDateString()}</span>
                                                             <span className="mx-2">•</span>
@@ -668,6 +671,173 @@
                                     <button 
                                         onClick={() => setShowSavedForms(false)}
                                         className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                                    >
+                                        Close
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* FAQ Modal */}
+                    <div className="fixed bottom-4 right-4 z-40">
+                        <button 
+                            onClick={() => setShowFAQ(!showFAQ)} 
+                            className="bg-blue-600 text-white px-4 py-3 rounded-full shadow-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                            title="Frequently Asked Questions"
+                        >
+                            <span className="font-medium text-sm">FAQ</span>
+                            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </button>
+                    </div>
+
+                    {showFAQ && (
+                        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                            <div className="bg-white rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                                <div className="flex items-center justify-between mb-6">
+                                    <h3 className="text-2xl font-bold text-gray-800">Frequently Asked Questions - Tenant Form</h3>
+                                    <button 
+                                        onClick={() => setShowFAQ(false)}
+                                        className="text-gray-500 hover:text-gray-700 text-3xl"
+                                    >
+                                        ×
+                                    </button>
+                                </div>
+                                
+                                <div className="space-y-6">
+                                    {/* FAQ 1 */}
+                                    <div className="border-l-4 border-green-500 pl-4">
+                                        <h4 className="text-lg font-semibold text-gray-800 mb-2">
+                                            Why do I need to enroll in MyGate (TAAOWA Society)?
+                                        </h4>
+                                        <div className="text-gray-700">
+                                            <p>Enrollment ensures you are formally registered under the new association-managed system. It helps streamline communication, facility access, and future digital services.</p>
+                                        </div>
+                                    </div>
+
+                                    {/* FAQ 2 */}
+                                    <div className="border-l-4 border-blue-500 pl-4">
+                                        <h4 className="text-lg font-semibold text-gray-800 mb-2">
+                                            Are tenants also required to register?
+                                        </h4>
+                                        <div className="text-gray-700">
+                                            <p><strong>Yes.</strong> All tenants must fill out the Tenant Registration Form so that the association has complete records of occupancy. This ensures safety, accountability, and proper communication.</p>
+                                        </div>
+                                    </div>
+
+                                    {/* FAQ 3 */}
+                                    <div className="border-l-4 border-purple-500 pl-4">
+                                        <h4 className="text-lg font-semibold text-gray-800 mb-2">
+                                            Who needs to register vehicles in MyGate?
+                                        </h4>
+                                        <div className="text-gray-700">
+                                            <p>All Car & Two-Wheeler owners (both Residents & Tenants) must register their vehicle details in MyGate. Stickers will be issued after successful registration to allow smooth parking management.</p>
+                                        </div>
+                                    </div>
+
+                                    {/* FAQ 4 */}
+                                    <div className="border-l-4 border-yellow-500 pl-4">
+                                        <h4 className="text-lg font-semibold text-gray-800 mb-2">
+                                            Can tenants also get parking stickers?
+                                        </h4>
+                                        <div className="text-gray-700">
+                                            <p><strong>Yes.</strong> Tenants with valid vehicle details registered in MyGate will be issued stickers, just like owners.</p>
+                                        </div>
+                                    </div>
+
+                                    {/* FAQ 5 */}
+                                    <div className="border-l-4 border-red-500 pl-4">
+                                        <h4 className="text-lg font-semibold text-gray-800 mb-2">
+                                            How will dual car parking / additional vehicles be managed?
+                                        </h4>
+                                        <div className="text-gray-700">
+                                            <p>Currently, MyGate allows only one vehicle per flat to be added by residents. For flats with dual car parking or additional vehicles, residents should submit details to the SPOCs. After validation, admins will add the extra vehicle(s) in MyGate and issue stickers accordingly.</p>
+                                        </div>
+                                    </div>
+
+                                    {/* FAQ 6 */}
+                                    <div className="border-l-4 border-indigo-500 pl-4">
+                                        <h4 className="text-lg font-semibold text-gray-800 mb-2">
+                                            Who should I reach out to for help?
+                                        </h4>
+                                        <div className="text-gray-700">
+                                            <p>Each tower has designated Points of Contact (SPOCs):</p>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+                                                <div className="bg-blue-50 p-3 rounded-lg">
+                                                    <h5 className="font-semibold text-blue-800">Tower A</h5>
+                                                    <p className="text-sm">Himanshu & Raghu</p>
+                                                </div>
+                                                <div className="bg-green-50 p-3 rounded-lg">
+                                                    <h5 className="font-semibold text-green-800">Tower B</h5>
+                                                    <p className="text-sm">Srivatsava & Sujatha</p>
+                                                </div>
+                                                <div className="bg-purple-50 p-3 rounded-lg">
+                                                    <h5 className="font-semibold text-purple-800">Tower C</h5>
+                                                    <p className="text-sm">Logeswari & Manoj</p>
+                                                </div>
+                                                <div className="bg-yellow-50 p-3 rounded-lg">
+                                                    <h5 className="font-semibold text-yellow-800">Tower D</h5>
+                                                    <p className="text-sm">Elavarsan & Sushurutha</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* FAQ 7 - Important Documents */}
+                                    <div className="border-l-4 border-red-500 pl-4">
+                                        <h4 className="text-lg font-semibold text-gray-800 mb-2">
+                                            📋 Important Association Documents
+                                        </h4>
+                                        <div className="text-gray-700 space-y-3">
+                                            <p>Access official TAAOWA documents for complete information:</p>
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                                                    <h5 className="font-semibold text-red-800 mb-2">🏛️ Association Registration Certificate</h5>
+                                                    <p className="text-sm text-gray-600 mb-3">Official registration certificate from the government authorities</p>
+                                                    <a 
+                                                        href="/public/documents/ACE- Association Registration Certificate.pdf" 
+                                                        target="_blank" 
+                                                        rel="noopener noreferrer"
+                                                        className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors"
+                                                    >
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                        </svg>
+                                                        View Certificate
+                                                    </a>
+                                                </div>
+                                                <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                                                    <h5 className="font-semibold text-blue-800 mb-2">📜 Bye-Laws & Members Signed</h5>
+                                                    <p className="text-sm text-gray-600 mb-3">Complete bye-laws document with member signatures</p>
+                                                    <a 
+                                                        href="/public/documents/Bye laws & Members signed.pdf" 
+                                                        target="_blank" 
+                                                        rel="noopener noreferrer"
+                                                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
+                                                    >
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                                        </svg>
+                                                        View Bye-Laws
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <div className="bg-gray-50 p-3 rounded-lg">
+                                                <p className="text-sm text-gray-600">
+                                                    <strong>Note:</strong> These documents contain the official rules and regulations that govern TAAOWA. 
+                                                    Tenants should review these documents to understand the association's policies and their responsibilities.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div className="mt-6 text-center">
+                                    <button 
+                                        onClick={() => setShowFAQ(false)}
+                                        className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                                     >
                                         Close
                                     </button>
