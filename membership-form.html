@@ -660,8 +660,8 @@
                     <div>
                         <div>To,</div>
                         <div className="font-medium">The President / Secretary</div>
-                        <div>{data.buildingName} Apartment Owners Welfare Association</div>
-                        <div>{data.addressLine}</div>
+                        <div class = 'text-sm'>{data.buildingName} Apartment Owners Welfare Association</div>
+                        <div class = 'text-sm'>{data.addressLine}</div>
                     </div>
 
                     {/* Salutation paragraph */}
@@ -699,8 +699,8 @@
                                                 <td className="py-1 pr-2">{owner.occupation || ""}</td>
                                                 <td className="py-1 pr-2">{owner.mobile || ""}</td>
                                                 <td className="py-1 pr-2">{owner.email || ""}</td>
-                                                <td className="py-1 pr-2">{data.block && ` ${data.block}`} {data.flatNo}</td>
-                                                <td className="py-1 pr-2">{data.areaSqft && `${data.areaSqft} sq ft`}</td>
+                                                <td className="py-1 pr-2">{owner.name && owner.name.trim() ? `${data.block && ` ${data.block}`} ${data.flatNo}` : ""}</td>
+                                                <td className="py-1 pr-2">{owner.name && owner.name.trim() ? `${data.areaSqft && `${data.areaSqft} sq ft`}` : ""}</td>
                                             </tr>
                                         );
                                     }
