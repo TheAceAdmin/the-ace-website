@@ -470,7 +470,8 @@
                                                     const firstTwo = parseInt(value.substring(0, 2));
                                                     const lastTwo = parseInt(value.substring(value.length - 2));
                                                     
-                                                    if (firstTwo < 1 || firstTwo > 19 || lastTwo < 1 || lastTwo > 8) {
+                                                    // Updated validation: Allow floor numbers 1-99 and flat numbers 01-99
+                                                    if (firstTwo < 1 || firstTwo > 99 || lastTwo < 1 || lastTwo > 99) {
                                                         // Highlight input in red instead of showing alert
                                                         e.target.style.borderColor = '#ef4444';
                                                         e.target.style.backgroundColor = '#fef2f2';
@@ -492,10 +493,10 @@
                                             className="mt-1 w-full rounded-xl border p-2 transition-colors duration-200" 
                                             placeholder="e.g., 1201 (3-4 digits)" 
                                             pattern="[0-9]{3,4}"
-                                            title="Enter 3-4 digits. First 2 digits: 1-19, Last 2 digits: 01-08"
+                                            title="Enter 3-4 digits. First 2 digits: 1-99, Last 2 digits: 01-99"
                                         />
                                         <div className="text-xs text-gray-500 mt-1">
-                                            Format: 3-4 digits. First 2 digits (1-19), Last 2 digits (01-08)
+                                            Format: 3-4 digits. First 2 digits (1-99), Last 2 digits (01-99)
                                         </div>
                                     </div>
                                     <div>
