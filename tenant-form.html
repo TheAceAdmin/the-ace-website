@@ -70,6 +70,8 @@
                 }
             }, []);
 
+
+
             // Save current form data
             function saveForm() {
                 console.log('Save form function called');
@@ -259,57 +261,60 @@ If the print dialog doesn't open or you can't save as PDF, try these steps:
                 }
             }
 
-            // Owner signature functions with proper mobile support
-            function getCanvasPoint(evt, canvas) {
-                const rect = canvas.getBoundingClientRect();
-                
-                // Get the canvas scaling factor (CSS size vs actual canvas size)
-                const scaleX = canvas.width / rect.width;
-                const scaleY = canvas.height / rect.height;
-                
-                // Calculate mouse/touch position relative to canvas
-                const clientX = evt.clientX ?? (evt.touches && evt.touches[0]?.clientX);
-                const clientY = evt.clientY ?? (evt.touches && evt.touches[0]?.clientY);
-                
-                const cx = (clientX - rect.left) * scaleX;
-                const cy = (clientY - rect.top) * scaleY;
-                
-                return { x: cx, y: cy };
-            }
-
+            // Owner signature functions (copied from working membership form)
             function startOwnerSignature(evt, ownerIndex) {
                 evt.preventDefault();
-                const canvas = document.querySelector(`canvas[data-owner-index="${ownerIndex}"]`);
-                if (!canvas) return;
+                console.log('startOwnerSignature called for index:', ownerIndex, 'Event type:', evt.type);
                 
+                const canvas = evt.target;
                 const ctx = canvas.getContext("2d");
                 ctx.lineWidth = 2;
                 ctx.lineCap = "round";
                 ctx.lineJoin = "round";
                 ctx.strokeStyle = "#111";
                 
-                const p = getCanvasPoint(evt, canvas);
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                const clientX = evt.clientX ?? (evt.touches && evt.touches[0]?.clientX);
+                const clientY = evt.clientY ?? (evt.touches && evt.touches[0]?.clientY);
+                const x = (clientX - rect.left) * scaleX;
+                const y = (clientY - rect.top) * scaleY;
+                
+                console.log('Canvas dimensions:', canvas.width, 'x', canvas.height);
+                console.log('Rect dimensions:', rect.width, 'x', rect.height);
+                console.log('Scale factors:', scaleX, scaleY);
+                console.log('Client coordinates:', clientX, clientY);
+                console.log('Calculated coordinates:', x, y);
+                
                 ctx.beginPath();
-                ctx.moveTo(p.x, p.y);
-                canvas.ownerLastPoint = p;
+                ctx.moveTo(x, y);
+                canvas.ownerLastPoint = { x, y };
             }
-
+            
             function moveOwnerSignature(evt, ownerIndex) {
-                const canvas = document.querySelector(`canvas[data-owner-index="${ownerIndex}"]`);
-                if (!canvas || !canvas.ownerLastPoint) return;
+                const canvas = evt.target;
+                if (!canvas.ownerLastPoint) return;
                 
-                evt.preventDefault();
                 const ctx = canvas.getContext("2d");
-                const p = getCanvasPoint(evt, canvas);
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                const clientX = evt.clientX ?? (evt.touches && evt.touches[0]?.clientX);
+                const clientY = evt.clientY ?? (evt.touches && evt.touches[0]?.clientY);
+                const x = (clientX - rect.left) * scaleX;
+                const y = (clientY - rect.top) * scaleY;
                 
-                ctx.lineTo(p.x, p.y);
+                console.log('Drawing line to:', x, y);
+                
+                ctx.lineTo(x, y);
                 ctx.stroke();
-                canvas.ownerLastPoint = p;
+                canvas.ownerLastPoint = { x, y };
             }
-
+            
             function endOwnerSignature(evt, ownerIndex) {
-                const canvas = document.querySelector(`canvas[data-owner-index="${ownerIndex}"]`);
-                if (!canvas || !canvas.ownerLastPoint) return;
+                const canvas = evt.target;
+                if (!canvas.ownerLastPoint) return;
                 
                 const url = canvas.toDataURL("image/png");
                 setOwner(ownerIndex, "canvasSignatureUrl", url);
@@ -327,7 +332,7 @@ If the print dialog doesn't open or you can't save as PDF, try these steps:
                 setOwner(ownerIndex, "canvasSignatureUrl", "");
             }
 
-            // Main signature functions with proper mobile support
+            // Main signature functions (copied from working membership form)
             const canvasRef = React.useRef(null);
             const isDrawingRef = React.useRef(false);
             const lastPointRef = React.useRef({ x: 0, y: 0 });
@@ -340,7 +345,7 @@ If the print dialog doesn't open or you can't save as PDF, try these steps:
                 const scaleX = canvas.width / rect.width;
                 const scaleY = canvas.height / rect.height;
                 
-                // Calculate mouse/touch position relative to canvas
+                // Calculate mouse position relative to canvas
                 const clientX = evt.clientX ?? (evt.touches && evt.touches[0]?.clientX);
                 const clientY = evt.clientY ?? (evt.touches && evt.touches[0]?.clientY);
                 
