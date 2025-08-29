@@ -178,8 +178,8 @@
                 setData(d => ({ ...d, owners: d.owners.filter((_, i) => i !== index) }));
             }
 
-            function handlePrint() {
-                // Always auto-save before printing with fixed name
+            function saveAsPDF() {
+                // Always auto-save before saving as PDF
                 const defaultName = "tenant-form-auto-save";
                 
                 // Check if a form with this name already exists
@@ -211,7 +211,52 @@
                     setCurrentFormId(formData.id);
                     localStorage.setItem('aceTenantForms', JSON.stringify(updatedForms));
                 }
-                window.print();
+                
+                // Try to use browser's built-in print function
+                try {
+                    window.print();
+                } catch (error) {
+                    console.error('Print function failed:', error);
+                    showMobilePrintInstructions();
+                }
+            }
+
+            function showMobilePrintInstructions() {
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+                
+                if (isMobile) {
+                    const instructions = `
+📱 Mobile Device Detected
+
+If the print dialog doesn't open or you can't save as PDF, try these steps:
+
+📱 iOS (iPhone/iPad):
+1. Tap the Share button (square with arrow up)
+2. Scroll down and tap "Print"
+3. In the print preview, tap the share button again
+4. Choose "Save to Files" or "Save to Photos"
+5. Select location and save
+
+🤖 Android:
+1. Tap the three dots menu (⋮)
+2. Select "Print" or "Share"
+3. Choose "Save as PDF" or "Print to PDF"
+4. Select save location
+
+💡 Alternative Method:
+• Take a screenshot of the form
+• Use your device's built-in PDF converter
+• Or email the form to yourself and save from email
+
+🔄 Try Again:
+• Refresh the page and try again
+• Or use a different browser (Chrome, Safari, Firefox)
+                    `;
+                    
+                    alert(instructions);
+                } else {
+                    alert('Print function failed. Please try refreshing the page or use a different browser.');
+                }
             }
 
             // Owner signature functions
@@ -339,7 +384,7 @@
                 const results = [];
                 results.push({ name: "Form loaded", pass: true });
                 results.push({ name: "Tenant form visible", pass: !!document.querySelector('[data-testid="tenant-form"]') });
-                results.push({ name: "Print button visible", pass: !!document.querySelector('[data-testid="print-button"]') });
+                results.push({ name: "PDF button visible", pass: !!document.querySelector('[data-testid="print-button"]') });
                 results.push({ name: "Tenant signature area visible", pass: !!document.querySelector('[data-testid="signature-tenant"]') });
                 const assocVisible = !!document.querySelector('[data-testid="signature-association"]');
                 results.push({ name: "Association signature default hidden", pass: !assocVisible });
@@ -369,7 +414,7 @@
                                         💾 Save Form
                                     </button>
                                     <button onClick={() => setShowSavedForms(!showSavedForms)} className="rounded-2xl px-3 py-2 bg-blue-600 text-white shadow hover:shadow-md active:scale-[.99] text-sm">📁 Load Form</button>
-                                    <button data-testid="print-button" onClick={handlePrint} className="rounded-2xl px-3 py-2 bg-black text-white shadow hover:shadow-md active:scale-[.99] text-sm">Print filled form</button>
+                                    <button data-testid="print-button" onClick={saveAsPDF} className="rounded-2xl px-3 py-2 bg-black text-white shadow hover:shadow-md active:scale-[.99] text-sm">Save as PDF</button>
                                     {currentFormId && (
                                         <div className="flex items-center gap-2 px-2 py-1 bg-green-100 text-green-800 rounded-lg text-xs">
                                             <span className="animate-pulse">💾</span>
