@@ -259,51 +259,61 @@ If the print dialog doesn't open or you can't save as PDF, try these steps:
                 }
             }
 
-            // Owner signature functions
+            // Owner signature functions with proper mobile support
+            function getCanvasPoint(evt, canvas) {
+                const rect = canvas.getBoundingClientRect();
+                
+                // Get the canvas scaling factor (CSS size vs actual canvas size)
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                
+                // Calculate mouse/touch position relative to canvas
+                const clientX = evt.clientX ?? (evt.touches && evt.touches[0]?.clientX);
+                const clientY = evt.clientY ?? (evt.touches && evt.touches[0]?.clientY);
+                
+                const cx = (clientX - rect.left) * scaleX;
+                const cy = (clientY - rect.top) * scaleY;
+                
+                return { x: cx, y: cy };
+            }
+
             function startOwnerSignature(evt, ownerIndex) {
                 evt.preventDefault();
                 const canvas = document.querySelector(`canvas[data-owner-index="${ownerIndex}"]`);
                 if (!canvas) return;
                 
                 const ctx = canvas.getContext("2d");
-                ctx.beginPath();
-                ctx.strokeStyle = "#000";
                 ctx.lineWidth = 2;
+                ctx.lineCap = "round";
                 ctx.lineJoin = "round";
+                ctx.strokeStyle = "#111";
                 
-                const rect = canvas.getBoundingClientRect();
-                const x = evt.clientX - rect.left;
-                const y = evt.clientY - rect.top;
-                
-                ctx.moveTo(x, y);
-                canvas.dataset.drawing = "true";
-                canvas.dataset.lastX = x;
-                canvas.dataset.lastY = y;
+                const p = getCanvasPoint(evt, canvas);
+                ctx.beginPath();
+                ctx.moveTo(p.x, p.y);
+                canvas.ownerLastPoint = p;
             }
 
             function moveOwnerSignature(evt, ownerIndex) {
                 const canvas = document.querySelector(`canvas[data-owner-index="${ownerIndex}"]`);
-                if (!canvas || canvas.dataset.drawing !== "true") return;
+                if (!canvas || !canvas.ownerLastPoint) return;
                 
+                evt.preventDefault();
                 const ctx = canvas.getContext("2d");
-                const rect = canvas.getBoundingClientRect();
-                const x = evt.clientX - rect.left;
-                const y = evt.clientY - rect.top;
+                const p = getCanvasPoint(evt, canvas);
                 
-                ctx.lineTo(x, y);
+                ctx.lineTo(p.x, p.y);
                 ctx.stroke();
-                
-                canvas.dataset.lastX = x;
-                canvas.dataset.lastY = y;
+                canvas.ownerLastPoint = p;
             }
 
             function endOwnerSignature(evt, ownerIndex) {
                 const canvas = document.querySelector(`canvas[data-owner-index="${ownerIndex}"]`);
-                if (!canvas) return;
+                if (!canvas || !canvas.ownerLastPoint) return;
                 
-                canvas.dataset.drawing = "false";
-                const url = canvas.toDataURL();
+                const url = canvas.toDataURL("image/png");
                 setOwner(ownerIndex, "canvasSignatureUrl", url);
+                canvas.ownerLastPoint = null;
             }
 
             function clearOwnerSignature(ownerIndex) {
@@ -317,7 +327,7 @@ If the print dialog doesn't open or you can't save as PDF, try these steps:
                 setOwner(ownerIndex, "canvasSignatureUrl", "");
             }
 
-            // Main signature functions
+            // Main signature functions with proper mobile support
             const canvasRef = React.useRef(null);
             const isDrawingRef = React.useRef(false);
             const lastPointRef = React.useRef({ x: 0, y: 0 });
@@ -330,7 +340,7 @@ If the print dialog doesn't open or you can't save as PDF, try these steps:
                 const scaleX = canvas.width / rect.width;
                 const scaleY = canvas.height / rect.height;
                 
-                // Calculate mouse position relative to canvas
+                // Calculate mouse/touch position relative to canvas
                 const clientX = evt.clientX ?? (evt.touches && evt.touches[0]?.clientX);
                 const clientY = evt.clientY ?? (evt.touches && evt.touches[0]?.clientY);
                 
