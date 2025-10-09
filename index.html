@@ -59,6 +59,7 @@
       [type="reset"],
       [type="submit"] {
         -webkit-appearance: button;
+        appearance: button;
         color: inherit;
       }
       button::-moz-focus-inner,
@@ -457,12 +458,156 @@
         margin-bottom: 20px;
         line-height: 1.4;
       }
+      
+      /* TAAOWA Elections Notification Banner */
+      .election-notification-banner {
+        background: linear-gradient(135deg, #000080 0%, #000060 100%);
+        color: white;
+        padding: 15px 0;
+        position: relative;
+        z-index: 1000;
+        box-shadow: 0 2px 10px rgba(0, 0, 128, 0.3);
+        animation: slideDown 0.5s ease-out;
+      }
+      
+      @keyframes slideDown {
+        from {
+          transform: translateY(-100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+      
+      
+      .banner-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        position: relative;
+      }
+      
+      .banner-icon {
+        font-size: 2rem;
+        flex-shrink: 0;
+        animation: pulse 2s infinite;
+      }
+      
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.1); }
+      }
+      
+      .banner-text {
+        flex: 1;
+        min-width: 0;
+      }
+      
+      .banner-title {
+        font-size: 1.4rem;
+        font-weight: 700;
+        margin-bottom: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      
+      .banner-subtitle {
+        font-size: 1rem;
+        opacity: 0.9;
+        font-weight: 400;
+      }
+      
+      .banner-actions {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex-shrink: 0;
+      }
+      
+      .banner-button {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+      
+      .banner-button:hover {
+        background: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      }
+      
+      
+      /* Mobile responsive banner */
+      @media (max-width: 768px) {
+        .banner-content {
+          flex-direction: column;
+          text-align: center;
+          gap: 15px;
+          padding: 0 15px;
+        }
+        
+        .banner-text {
+          order: 2;
+        }
+        
+        .banner-actions {
+          order: 3;
+          justify-content: center;
+        }
+        
+        .banner-icon {
+          order: 1;
+          font-size: 1.8rem;
+        }
+        
+        .banner-title {
+          font-size: 1.2rem;
+        }
+        
+        .banner-subtitle {
+          font-size: 0.9rem;
+        }
+        
+        .banner-button {
+          padding: 8px 16px;
+          font-size: 0.8rem;
+        }
+      }
+      
     </style>
   </head>
   <body>
     <link rel="stylesheet" href="./style.css" />
     <div>
       <link href="./index.css" rel="stylesheet" />
+
+      <!-- TAAOWA Elections Notification Banner -->
+      <div id="electionBanner" class="election-notification-banner">
+        <div class="banner-content">
+          <div class="banner-icon">🗳️</div>
+          <div class="banner-text">
+            <div class="banner-title">TAAOWA Elections 2025-27</div>
+            <div class="banner-subtitle">Election to the Board of Managers & Principal Officer - Now Open!</div>
+          </div>
+          <div class="banner-actions">
+            <a href="taaowa-elections-2025-27.html" class="banner-button">View Details</a>
+          </div>
+        </div>
+      </div>
 
       <div class="landing-page-container1">
         <div class="landing-page-top-container">
@@ -604,6 +749,7 @@
 
       
 
+      
       
       function openKidsModal() {
         console.log('openKidsModal called');
