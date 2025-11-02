@@ -74,7 +74,7 @@
       }
       
       .main-container {
-        max-width: 1400px;
+        max-width: 1000px;
         margin: 30px auto;
         padding: 0 20px;
       }
@@ -98,7 +98,7 @@
         background-color: #ffffff;
         border-radius: 8px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
+        padding: 30px;
         margin-bottom: 20px;
       }
       
@@ -107,6 +107,8 @@
         color: white;
         padding: 20px;
         text-align: center;
+        border-radius: 8px 8px 0 0;
+        margin: -30px -30px 30px -30px;
       }
       
       .calculator-header h2 {
@@ -115,83 +117,120 @@
         margin-bottom: 5px;
       }
       
-      .calculator-header p {
-        font-size: 14px;
-        opacity: 0.9;
+      .form-group {
+        margin-bottom: 20px;
       }
       
-      .iframe-wrapper {
-        position: relative;
-        width: 100%;
-        padding-bottom: 75%; /* 4:3 aspect ratio */
-        height: 0;
-        overflow: hidden;
-        background-color: #f9f9f9;
-      }
-      
-      .iframe-wrapper iframe {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        border: none;
-        min-height: 800px;
-      }
-      
-      .open-sheet-link {
-        text-align: center;
-        margin-top: 20px;
-        padding: 20px;
-      }
-      
-      .open-sheet-link a {
-        color: #000080;
-        text-decoration: none;
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
         font-weight: 500;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 10px 20px;
-        border: 2px solid #000080;
-        border-radius: 4px;
-        transition: all 0.3s ease;
+        color: #333;
+        font-size: 14px;
       }
       
-      .open-sheet-link a:hover {
-        background-color: #000080;
-        color: white;
-      }
-      
-      /* Mobile-only button at top */
-      .open-sheet-link-mobile {
-        display: none;
-        text-align: center;
-        margin: 20px 0;
-        padding: 0 15px;
-      }
-      
-      .open-sheet-link-mobile a {
-        color: #000080;
-        text-decoration: none;
-        font-weight: 600;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 10px;
-        padding: 15px 25px;
-        border: 2px solid #000080;
-        border-radius: 6px;
-        transition: all 0.3s ease;
-        background-color: white;
+      .form-group input,
+      .form-group select {
         width: 100%;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 12px 15px;
+        border: 2px solid #ddd;
+        border-radius: 4px;
         font-size: 16px;
+        font-family: 'Poppins', sans-serif;
+        transition: border-color 0.3s ease;
       }
       
-      .open-sheet-link-mobile a:active {
+      .form-group input:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: #000080;
+      }
+      
+      .form-group input[readonly] {
+        background-color: #f5f5f5;
+        cursor: not-allowed;
+        color: #666;
+      }
+      
+      .form-group input[readonly]:focus {
+        border-color: #ddd;
+      }
+      
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+      
+      .results-container {
+        background-color: #e8f4f8;
+        border-left: 4px solid #000080;
+        padding: 20px;
+        margin-top: 30px;
+        border-radius: 4px;
+      }
+      
+      .results-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #000080;
+        margin-bottom: 15px;
+      }
+      
+      .result-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #ccc;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      
+      .result-item:last-child {
+        border-bottom: none;
+        font-weight: 700;
+        font-size: 18px;
+        color: #000080;
+        padding-top: 15px;
+        margin-top: 10px;
+        border-top: 2px solid #000080;
+      }
+      
+      .result-label {
+        color: #666;
+        flex: 1;
+        min-width: 0;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+      }
+      
+      .result-value {
+        font-weight: 600;
+        color: #000080;
+        flex-shrink: 0;
+        text-align: right;
+      }
+      
+      .calculate-button {
+        width: 100%;
+        padding: 15px;
         background-color: #000080;
         color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        font-weight: 600;
+        font-family: 'Poppins', sans-serif;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin-top: 10px;
+      }
+      
+      .calculate-button:hover {
+        background-color: #000060;
+      }
+      
+      .calculate-button:active {
         transform: scale(0.98);
       }
       
@@ -206,21 +245,18 @@
       .info-box p {
         margin: 5px 0;
         color: #333;
-      }
-      
-      .edit-notice {
-        background-color: #e7f3ff;
-        border-left: 4px solid #2196F3;
-        padding: 15px 20px;
-        margin: 20px 0;
-        border-radius: 4px;
-        text-align: center;
-      }
-      
-      .edit-notice p {
-        margin: 0;
-        color: #1565C0;
         font-size: 14px;
+      }
+      
+      .flat-display {
+        font-size: 18px;
+        font-weight: 600;
+        color: #000080;
+        text-align: center;
+        padding: 10px;
+        background-color: #f0f0f0;
+        border-radius: 4px;
+        margin-bottom: 20px;
       }
       
       @media (max-width: 768px) {
@@ -233,17 +269,29 @@
           gap: 15px;
         }
         
+        .header-title {
+          font-size: 18px;
+        }
+        
+        .header-logo {
+          height: 40px;
+        }
+        
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+        
         .main-container {
           margin: 15px auto;
           padding: 0 15px;
         }
         
-        .info-box {
+        .calculator-container {
           padding: 15px;
-          font-size: 14px;
         }
         
         .calculator-header {
+          margin: -15px -15px 15px -15px;
           padding: 15px;
         }
         
@@ -251,16 +299,47 @@
           font-size: 20px;
         }
         
-        .open-sheet-link {
+        .result-item {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        
+        .result-label {
+          font-size: 13px;
+          margin-bottom: 4px;
+        }
+        
+        .result-value {
+          text-align: left;
+          font-size: 15px;
+        }
+        
+        .result-item:last-child {
+          font-size: 16px;
+        }
+        
+        .info-box {
           padding: 15px;
+          font-size: 13px;
         }
         
-        .open-sheet-link {
-          display: none; /* Hide desktop button on mobile */
+        .info-box p {
+          font-size: 13px;
         }
         
-        .open-sheet-link-mobile {
-          display: block; /* Show mobile button */
+        .page-subtitle {
+          font-size: 14px;
+        }
+        
+        .calculate-button {
+          padding: 14px;
+          font-size: 15px;
+        }
+        
+        .form-group input,
+        .form-group select {
+          font-size: 16px; /* Prevents zoom on iOS */
+          padding: 14px;
         }
       }
       
@@ -269,29 +348,20 @@
           font-size: 20px;
         }
         
-        .page-subtitle {
+        .calculator-header h2 {
+          font-size: 18px;
+        }
+        
+        .result-label {
+          font-size: 12px;
+        }
+        
+        .result-value {
           font-size: 14px;
         }
         
-        .main-container {
-          padding: 0 10px;
-        }
-      }
-      
-      /* Mobile-specific message */
-      .mobile-notice {
-        display: none;
-        background-color: #fff3cd;
-        border: 1px solid #ffc107;
-        border-radius: 4px;
-        padding: 15px;
-        margin-bottom: 20px;
-        text-align: center;
-      }
-      
-      @media (max-width: 768px) {
-        .mobile-notice {
-          display: block;
+        .info-box {
+          padding: 12px;
         }
       }
     </style>
@@ -311,85 +381,426 @@
       <h1 class="page-title">Maintenance Calculator</h1>
       <p class="page-subtitle">Calculate your maintenance charges based on your block, door number, and handover date</p>
       
-      <!-- Mobile-only button at top -->
-      <div class="open-sheet-link-mobile">
-        <a href="https://docs.google.com/spreadsheets/d/1WKp5U0H6NDlOmU3JoHgfnBTCfgD_nAxCFJYOt687sk4/edit?gid=0#gid=0" target="_blank" rel="noopener noreferrer">
-          <span>📝 Open in Google Sheets (Recommended for Editing)</span>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-            <polyline points="15 3 21 3 21 9"></polyline>
-            <line x1="10" y1="14" x2="21" y2="3"></line>
-          </svg>
-        </a>
-      </div>
-      
-      <div class="mobile-notice">
-        <p style="margin: 0; color: #856404;"><strong>📱 Mobile Tip:</strong> Use the button above for the best editing experience on mobile devices.</p>
-      </div>
-      
       <div class="info-box">
         <p><strong>Instructions:</strong></p>
         <p>Enter your block and door number in the calculator below. The rest of the fields will automatically calculate based on your handover date and square footage.</p>
-        <p style="margin-top: 10px;"><strong>⚠️ Important:</strong> To edit the calculator (use dropdowns, type inputs), you must:</p>
-        <ol style="margin-left: 20px; margin-top: 10px; padding-left: 0;">
-          <li>Be logged into your Google account</li>
-          <li>Make sure the sheet is shared with you (or use "Anyone with the link can edit")</li>
-          <li>If editing in the embedded view doesn't work, click "Open in Google Sheets" below for full functionality</li>
-        </ol>
       </div>
       
       <div class="calculator-container">
         <div class="calculator-header">
           <h2>Maintenance Calculator</h2>
-          <p>Live Google Sheets Calculator</p>
-        </div>
-        <div class="iframe-wrapper">
-          <iframe 
-            id="calculatorIframe"
-            src="https://docs.google.com/spreadsheets/d/1WKp5U0H6NDlOmU3JoHgfnBTCfgD_nAxCFJYOt687sk4/edit?usp=sharing&rm=minimal"
-            frameborder="0"
-            allowfullscreen
-            scrolling="yes"
-            allow="clipboard-read; clipboard-write"
-            style="overflow-x: auto; -webkit-overflow-scrolling: touch; pointer-events: auto;"
-            title="Maintenance Calculator">
-          </iframe>
+          <p>Calculate your maintenance charges</p>
         </div>
         
-        <div class="edit-notice">
-          <p><strong>💡 Having trouble editing?</strong> Make sure you're logged into your Google account. For the best editing experience, use the "Open in Google Sheets" button below.</p>
+        <form id="calculatorForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="block">Block *</label>
+              <input type="text" id="block" name="block" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="doorNumber">Door Number *</label>
+              <input type="text" id="doorNumber" name="doorNumber" required>
+            </div>
+          </div>
+          
+          <div id="flatDisplay" class="flat-display" style="display: none;"></div>
+          
+          <button type="submit" class="calculate-button">Calculate Maintenance</button>
+        </form>
+        
+        <div id="results" class="results-container" style="display: none;">
+          <div class="results-title">Calculation Results</div>
+          <div class="result-item">
+            <span class="result-label">Handover Date (DD-MM-YYYY):</span>
+            <span class="result-value" id="handoverDateResult">-</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Square Feet (Sq Ft):</span>
+            <span class="result-value" id="sqftResult">-</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Total Number of days:</span>
+            <span class="result-value" id="daysResult">-</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Months:</span>
+            <span class="result-value" id="monthsResult">-</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Days (remaining):</span>
+            <span class="result-value" id="remainingDaysResult">-</span>
+          </div>
+          <div class="result-item">
+            <!-- This label is dynamically updated by JavaScript to show actual day count -->
+            <span class="result-label" id="maintenanceDaysLabel">Maintenance for Days (Rs. 4 × SqFt × Days × 12/365):</span>
+            <span class="result-value" id="maintenanceDaysResult">-</span>
+          </div>
+          <div class="result-item">
+            <!-- This label is dynamically updated by JavaScript to show actual month count -->
+            <span class="result-label" id="maintenanceMonthsLabel">Maintenance for Months (Rs. 4 × SqFt × Months):</span>
+            <span class="result-value" id="maintenanceMonthsResult">-</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Total Maintenance Amount (Rs.):</span>
+            <span class="result-value" id="totalResult">-</span>
+          </div>
         </div>
       </div>
       
-      <div class="open-sheet-link">
-        <a href="https://docs.google.com/spreadsheets/d/1WKp5U0H6NDlOmU3JoHgfnBTCfgD_nAxCFJYOt687sk4/edit?gid=0#gid=0" target="_blank" rel="noopener noreferrer" style="font-size: 18px; padding: 15px 30px;">
-          <span>📝 Open in Google Sheets (Recommended for Editing)</span>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-            <polyline points="15 3 21 3 21 9"></polyline>
-            <line x1="10" y1="14" x2="21" y2="3"></line>
-          </svg>
-        </a>
-      </div>
-      
-      <div style="text-align: center; margin-top: 20px; padding: 15px; background-color: #f0f0f0; border-radius: 4px;">
-        <p style="margin: 0; color: #666; font-size: 14px;">
-          <strong>Note:</strong> The embedded calculator above may have limited interactivity. For full editing capabilities (dropdowns, cell editing), please use the "Open in Google Sheets" button above.
-        </p>
+      <div class="info-box" style="margin-top: 30px;">
+        <p><strong>FAQ:</strong></p>
+        <p style="margin-top: 10px;"><strong>1. Why this period?</strong> We all have handover at different points of time. This is the first invoice. Hence, this is raised for a singular period from the completion of your handover till Mar'2026.</p>
+        <p style="margin-top: 10px;"><strong>2. Why only Rs. 4?</strong> This is only for maintenance. Water will be on actuals and shall be shared separately.</p>
+        <p style="margin-top: 10px;"><strong>3. Why is it collected in advance?</strong> As discussed in GBM, our current expense is budgeted at Rs. 30 lakhs per month (excl. water). Builder has handed over Rs. 1.03 cr during transition in Sep 25. To ensure that we have continued operations in Ace, this amount is collected.</p>
+        <p style="margin-top: 10px;"><strong>4. Due date:</strong> The due date has been changed from 30th Nov to 15th Dec 2025.</p>
+        <p style="margin-top: 10px;"><strong>5. What will be my frequency of billing?</strong> From Apr 2026, we will review our cash position and we will have Monthly/Quarterly/HalfYearly/Annual. Subject to approval of a general body meeting, this shall be published in Feb 2026.</p>
+        <p style="margin-top: 10px;"><strong>6. What types of payment are supported?</strong> We accept payments through MyGate, SBI Collect and Cheque (please check MyGate notice for details).</p>
       </div>
     </div>
     
     <script>
-      // Note: For the Google Sheet to embed properly, it needs to be:
-      // 1. Shared publicly (View access for anyone with the link)
-      // 2. Preferably published (File > Share > Publish to web) for best embedding results
+      // Master data storage
+      let masterData = [];
       
-      // Set a reasonable minimum height
-      const iframe = document.getElementById('calculatorIframe');
-      if (iframe) {
-        iframe.style.minHeight = '800px';
+      // Fetch and decode master data at runtime
+      async function loadMasterData() {
+        try {
+          const response = await fetch('./public/documents/master-data');
+          if (!response.ok) {
+            throw new Error('Failed to fetch master data');
+          }
+          
+          const base64Data = await response.text();
+          
+          // Decode base64
+          const decodedData = atob(base64Data);
+          
+          // Parse CSV
+          const lines = decodedData.split('\n').filter(line => line.trim());
+          
+          // Skip header/metadata rows - start from first actual data row
+          let startIndex = 0;
+          for (let i = 0; i < lines.length; i++) {
+            // Find the header row that contains "Sl. No" or similar
+            if (lines[i].includes('Sl. No') || lines[i].includes('Flat No')) {
+              startIndex = i + 1;
+              break;
+            }
+          }
+          
+          // Parse data rows
+          for (let i = startIndex; i < lines.length; i++) {
+            const line = lines[i];
+            if (!line.trim()) continue;
+            
+            // Handle CSV parsing with quoted fields
+            const values = [];
+            let current = '';
+            let inQuotes = false;
+            
+            for (let j = 0; j < line.length; j++) {
+              const char = line[j];
+              
+              if (char === '"') {
+                inQuotes = !inQuotes;
+                // Don't add quote to current if it's the opening/closing quote
+              } else if (char === ',' && !inQuotes) {
+                // Remove quotes from value if present
+                let cleaned = current.trim();
+                if (cleaned.startsWith('"') && cleaned.endsWith('"')) {
+                  cleaned = cleaned.slice(1, -1);
+                }
+                values.push(cleaned);
+                current = '';
+              } else {
+                current += char;
+              }
+            }
+            // Add last value
+            let cleaned = current.trim();
+            if (cleaned.startsWith('"') && cleaned.endsWith('"')) {
+              cleaned = cleaned.slice(1, -1);
+            }
+            values.push(cleaned);
+            
+            if (values.length > 0) {
+              // Map according to Google Sheets VLOOKUP range C:J
+              // C = Flat No (values[2]), D = Handover (values[3]), E = Maintenance start (values[4]),
+              // F = New charge start (values[5]), G = Days (values[6]), H = Months (values[7]),
+              // I = Maintenance charge (values[8]), J = Sq. Ft (values[9])
+              masterData.push({
+                slNo: values[0] || '',
+                appNo: values[1] || '',
+                flatNo: values[2] || '',      // Column C - lookup key
+                handover: values[3] || '',    // Column D - VLOOKUP index 2
+                maintenanceStart: values[4] || '',
+                newChargeStart: values[5] || '',
+                daysUntilMonthEnd: values[6] || '',  // Column G - VLOOKUP index 5
+                monthsUntil0104: values[7] || '',    // Column H - VLOOKUP index 6
+                maintenanceCharge: values[8] || '',  // Column I - VLOOKUP index 7
+                sqFt: values[9] || '',        // Column J - VLOOKUP index 8
+                model: values[10] || '',
+                raw: values
+              });
+            }
+          }
+          
+          console.log(`Loaded ${masterData.length} records from master data`);
+          return masterData;
+        } catch (error) {
+          console.error('Error loading master data:', error);
+          return [];
+        }
       }
+      
+      // Find flat data by block and door number
+      function findFlatData(block, doorNumber) {
+        const flatKey = `${block}-${doorNumber}`.toUpperCase();
+        return masterData.find(record => {
+          const recordFlatNo = (record.flatNo || '').toUpperCase();
+          return recordFlatNo === flatKey || recordFlatNo.includes(flatKey);
+        });
+      }
+      
+      // Initialize master data on page load
+      loadMasterData().then(() => {
+        console.log('Master data loaded successfully');
+      });
+      
+      const blockInput = document.getElementById('block');
+      const doorNumberInput = document.getElementById('doorNumber');
+      const flatDisplay = document.getElementById('flatDisplay');
+      
+      // Store handover date and sqft for later use
+      let storedHandoverDate = '';
+      let storedHandoverDateDisplay = ''; // Store original format for display
+      let storedSqft = '';
+      
+      // Auto-update flat display when block or door number changes
+      function updateFlatDisplay() {
+        const block = blockInput.value.trim().toUpperCase();
+        const doorNumber = doorNumberInput.value.trim();
+        
+        // Clear stored values if block or door number is empty
+        if (!block || !doorNumber) {
+          flatDisplay.style.display = 'none';
+          storedHandoverDate = '';
+          storedHandoverDateDisplay = '';
+          storedSqft = '';
+          return;
+        }
+        
+        flatDisplay.textContent = `Flat: ${block}-${doorNumber}`;
+        flatDisplay.style.display = 'block';
+        
+        // Try to get data from master data and store it
+        const flatData = findFlatData(block, doorNumber);
+        if (flatData) {
+          // Store handover date from CSV
+          if (flatData.handover && flatData.handover !== 'No handover' && flatData.handover.trim() !== '') {
+            const dateParts = flatData.handover.split('/');
+            if (dateParts.length === 3) {
+              const day = dateParts[0].padStart(2, '0');
+              const month = dateParts[1].padStart(2, '0');
+              let year = dateParts[2].trim();
+              
+              // Handle 2-digit year (assume 20xx if < 100)
+              if (year.length === 2) {
+                year = '20' + year;
+              }
+              
+              // Store in YYYY-MM-DD format for calculations
+              storedHandoverDate = `${year}-${month}-${day}`;
+              
+              // Store in DD-MM-YYYY format for display
+              storedHandoverDateDisplay = `${day}-${month}-${year}`;
+            } else {
+              storedHandoverDate = flatData.handover;
+              storedHandoverDateDisplay = flatData.handover;
+            }
+          } else {
+            storedHandoverDate = '';
+            storedHandoverDateDisplay = '';
+          }
+          
+          // Store square footage from CSV (remove commas for calculation)
+          if (flatData.sqFt && flatData.sqFt.trim() !== '') {
+            storedSqft = flatData.sqFt.replace(/,/g, '').replace(/"/g, '').trim();
+          } else {
+            storedSqft = '';
+          }
+        } else {
+          // Clear stored values if flat not found
+          storedHandoverDate = '';
+          storedHandoverDateDisplay = '';
+          storedSqft = '';
+        }
+      }
+      
+      blockInput.addEventListener('input', updateFlatDisplay);
+      doorNumberInput.addEventListener('input', updateFlatDisplay);
+      
+      // Calculate maintenance using data from CSV
+      document.getElementById('calculatorForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const block = blockInput.value.trim().toUpperCase();
+        const doorNumber = document.getElementById('doorNumber').value.trim();
+        
+        // Get flat data from master data
+        const flatData = findFlatData(block, doorNumber);
+        
+        if (!flatData) {
+          alert('Flat data not found. Please check your block and door number.');
+          return;
+        }
+        
+        // Get values from CSV (matching Google Sheets VLOOKUP formulas)
+        const days = flatData.daysUntilMonthEnd || '0';  // Column G - VLOOKUP index 5
+        const months = flatData.monthsUntil0104 || '0';  // Column H - VLOOKUP index 6
+        const maintenanceCharge = flatData.maintenanceCharge || '0';  // Column I - VLOOKUP index 7
+        
+        // Debug logging - check raw values
+        console.log('Raw flatData:', flatData);
+        console.log('Raw days value:', days);
+        console.log('Raw months value:', months);
+        
+        // Parse values (handle comma-separated numbers and empty strings)
+        let daysNum = 0;
+        let monthsNum = 0;
+        
+        if (days && days.toString().trim() !== '') {
+          const cleanedDays = days.toString().replace(/,/g, '').replace(/"/g, '').trim();
+          daysNum = parseInt(cleanedDays, 10);
+          if (isNaN(daysNum)) daysNum = 0;
+        }
+        
+        if (months && months.toString().trim() !== '') {
+          const cleanedMonths = months.toString().replace(/,/g, '').replace(/"/g, '').trim();
+          monthsNum = parseInt(cleanedMonths, 10);
+          if (isNaN(monthsNum)) monthsNum = 0;
+        }
+        
+        const totalMaintenanceNum = parseFloat(maintenanceCharge.toString().replace(/,/g, '').replace(/"/g, '').trim()) || 0;
+        
+        // Debug logging after parsing
+        console.log('Parsed daysNum:', daysNum);
+        console.log('Parsed monthsNum:', monthsNum);
+        
+        // CRITICAL: Update labels IMMEDIATELY after parsing to replace "Days" and "Months" with actual values
+        // This replaces the static text "Maintenance for Days" with "Maintenance for 24 days" (example)
+        const maintenanceDaysLabelEl = document.getElementById('maintenanceDaysLabel');
+        const maintenanceMonthsLabelEl = document.getElementById('maintenanceMonthsLabel');
+        
+        // Ensure we have valid values to display
+        const displayDaysNum = (isNaN(daysNum) || daysNum === undefined || daysNum === null) ? 0 : daysNum;
+        const displayMonthsNum = (isNaN(monthsNum) || monthsNum === undefined || monthsNum === null) ? 0 : monthsNum;
+        
+        console.log('=== UPDATING LABELS ===');
+        console.log('Display Days:', displayDaysNum, 'Display Months:', displayMonthsNum);
+        
+        // Update the Days label - replace static "Days" with actual number
+        if (maintenanceDaysLabelEl) {
+          const newLabelText = `Maintenance for ${displayDaysNum} days (Rs. 4 × SqFt × Days × 12/365):`;
+          maintenanceDaysLabelEl.innerHTML = newLabelText;
+          console.log('✓ Days label updated:', maintenanceDaysLabelEl.textContent);
+        } else {
+          console.error('✗ maintenanceDaysLabelEl element NOT found in DOM!');
+        }
+        
+        // Update the Months label - replace static "Months" with actual number
+        if (maintenanceMonthsLabelEl) {
+          const newLabelText = `Maintenance for ${displayMonthsNum} Months (Rs. 4 × SqFt × Months):`;
+          maintenanceMonthsLabelEl.innerHTML = newLabelText;
+          console.log('✓ Months label updated:', maintenanceMonthsLabelEl.textContent);
+        } else {
+          console.error('✗ maintenanceMonthsLabelEl element NOT found in DOM!');
+        }
+        
+        // Calculate maintenance for days and months separately
+        // Maintenance for days uses the days value from CSV
+        // Maintenance for months uses the months value from CSV
+        const totalDays = daysNum + (monthsNum * 30); // Total days from handover to month end
+        
+        // Format numbers with commas and 2 decimal places
+        function formatCurrency(num) {
+          return '₹' + num.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+        
+        function formatNumber(num) {
+          return num.toLocaleString('en-IN');
+        }
+        
+        // Display handover date and sqft in results
+        // Use storedHandoverDateDisplay which is already in DD-MM-YYYY format
+        document.getElementById('handoverDateResult').textContent = storedHandoverDateDisplay || '-';
+        document.getElementById('sqftResult').textContent = storedSqft ? formatNumber(parseFloat(storedSqft)) : '-';
+        
+        // Display results from CSV data
+        document.getElementById('daysResult').textContent = totalDays + ' days';
+        document.getElementById('monthsResult').textContent = monthsNum + ' months';
+        document.getElementById('remainingDaysResult').textContent = daysNum + ' days';
+        
+        // Calculate maintenance for days and months using the formula
+        const sqft = parseFloat(storedSqft) || 0;
+        let maintenanceForDays = 0;
+        let maintenanceForMonths = 0;
+        
+        if (sqft > 0 && daysNum > 0 && monthsNum >= 0) {
+          // Maintenance for days: 4 × SqFt × number of days × 12/365
+          maintenanceForDays = 4 * sqft * daysNum * (12 / 365);
+          
+          // Maintenance for months: 4 × SqFt × number of months
+          maintenanceForMonths = 4 * sqft * monthsNum;
+        }
+        
+        // Use total maintenance from CSV if calculated total doesn't match
+        const calculatedTotal = maintenanceForDays + maintenanceForMonths;
+        const finalTotal = totalMaintenanceNum > 0 ? totalMaintenanceNum : calculatedTotal;
+        
+        // Display formatted results
+        document.getElementById('maintenanceDaysResult').textContent = formatCurrency(maintenanceForDays);
+        document.getElementById('maintenanceMonthsResult').textContent = formatCurrency(maintenanceForMonths);
+        document.getElementById('totalResult').textContent = formatCurrency(finalTotal);
+        
+        // Show results first
+        document.getElementById('results').style.display = 'block';
+        
+        // Force update labels AFTER results div is visible (most reliable timing)
+        // Use requestAnimationFrame to ensure DOM is ready
+        requestAnimationFrame(() => {
+          const finalMaintenanceDaysLabelEl = document.querySelector('#maintenanceDaysLabel');
+          const finalMaintenanceMonthsLabelEl = document.querySelector('#maintenanceMonthsLabel');
+          
+          const finalDaysValue = (isNaN(daysNum) || daysNum === undefined || daysNum === null) ? 0 : daysNum;
+          const finalMonthsValue = (isNaN(monthsNum) || monthsNum === undefined || monthsNum === null) ? 0 : monthsNum;
+          
+          console.log('Final update - Values:', { finalDaysValue, finalMonthsValue, daysNum, monthsNum });
+          
+          if (finalMaintenanceDaysLabelEl) {
+            const labelText = `Maintenance for ${finalDaysValue} days (Rs. 4 × SqFt × Days × 12/365):`;
+            finalMaintenanceDaysLabelEl.textContent = labelText;
+            finalMaintenanceDaysLabelEl.innerHTML = labelText.replace(String(finalDaysValue), `<strong>${finalDaysValue}</strong>`);
+            console.log('Final update - Days label set to:', finalMaintenanceDaysLabelEl.textContent);
+          } else {
+            console.error('finalMaintenanceDaysLabelEl not found in final update!');
+          }
+          
+          if (finalMaintenanceMonthsLabelEl) {
+            const labelText = `Maintenance for ${finalMonthsValue} Months (Rs. 4 × SqFt × Months):`;
+            finalMaintenanceMonthsLabelEl.textContent = labelText;
+            finalMaintenanceMonthsLabelEl.innerHTML = labelText.replace(String(finalMonthsValue), `<strong>${finalMonthsValue}</strong>`);
+            console.log('Final update - Months label set to:', finalMaintenanceMonthsLabelEl.textContent);
+          } else {
+            console.error('finalMaintenanceMonthsLabelEl not found in final update!');
+          }
+        });
+        
+        // Scroll to results
+        document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
     </script>
   </body>
 </html>
-
