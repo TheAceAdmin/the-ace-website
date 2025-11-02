@@ -59,7 +59,6 @@
       [type="reset"],
       [type="submit"] {
         -webkit-appearance: button;
-        appearance: button;
         color: inherit;
       }
       button::-moz-focus-inner,
@@ -176,10 +175,26 @@
         cursor: pointer;
         transition: all 0.3s ease;
         margin-right: 15px;
+        display: inline-block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
       }
       
       .nav-rsvp-button:hover {
         background: rgba(0, 0, 128, 0.1);
+      }
+      
+      /* Ensure navigation container shows all buttons */
+      .landing-page-right-side1 {
+        display: flex !important;
+        align-items: center;
+        flex-direction: row;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      
+      .landing-page-right-side1 > div {
+        flex-shrink: 0;
       }
       
       /* Ensure buttons are clickable */
@@ -439,13 +454,27 @@
       }
       
       /* Show burger menu on mobile */
-      @media (max-width: 768px) {
+      @media (max-width: 991px) {
         .landing-page-burger-menu1 {
           display: block;
         }
         
         .landing-page-right-side1 {
-          display: none;
+          display: none !important;
+        }
+      }
+      
+      /* Ensure navigation bar has enough space */
+      @media (min-width: 992px) {
+        .landing-page-navbar {
+          flex-wrap: nowrap;
+          overflow: visible;
+        }
+        
+        .landing-page-right-side1 {
+          display: flex !important;
+          flex-wrap: wrap;
+          max-width: none;
         }
       }
       
@@ -459,155 +488,150 @@
         line-height: 1.4;
       }
       
-      /* TAAOWA Elections Notification Banner */
-      .election-notification-banner {
-        background: linear-gradient(135deg, #000080 0%, #000060 100%);
-        color: white;
-        padding: 15px 0;
-        position: relative;
-        z-index: 1000;
-        box-shadow: 0 2px 10px rgba(0, 0, 128, 0.3);
-        animation: slideDown 0.5s ease-out;
+      /* Maintenance Calculator Banner */
+      .maintenance-calculator-banner {
+        width: 100% !important;
+        display: block !important;
+        visibility: visible !important;
+        background: linear-gradient(135deg, #000080 0%, #1a1a99 100%) !important;
+        padding: 40px 20px !important;
+        margin: 0 !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+        position: relative !important;
+        z-index: 1000 !important;
+        opacity: 1 !important;
+        min-height: auto !important;
+        overflow: visible !important;
       }
       
-      @keyframes slideDown {
-        from {
-          transform: translateY(-100%);
-          opacity: 0;
-        }
-        to {
-          transform: translateY(0);
-          opacity: 1;
-        }
+      /* Ensure body doesn't hide banner */
+      body {
+        overflow-x: hidden;
       }
       
+      /* Make sure banner is first visible element */
+      body > .maintenance-calculator-banner {
+        position: relative !important;
+        display: block !important;
+      }
       
       .banner-content {
         max-width: 1200px;
         margin: 0 auto;
-        padding: 0 20px;
-        display: flex;
+        display: flex !important;
         align-items: center;
-        gap: 20px;
-        position: relative;
+        justify-content: space-between;
+        gap: 30px;
+        flex-wrap: wrap;
+        visibility: visible !important;
       }
       
       .banner-icon {
-        font-size: 2rem;
+        font-size: 48px;
+        line-height: 1;
         flex-shrink: 0;
-        animation: pulse 2s infinite;
-      }
-      
-      @keyframes pulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.1); }
       }
       
       .banner-text {
         flex: 1;
-        min-width: 0;
+        min-width: 250px;
+        color: white;
       }
       
       .banner-title {
-        font-size: 1.4rem;
+        font-size: 24px;
         font-weight: 700;
-        margin-bottom: 4px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+        margin-bottom: 8px;
+        color: white;
       }
       
-      .banner-subtitle {
-        font-size: 1rem;
-        opacity: 0.9;
-        font-weight: 400;
-      }
-      
-      .banner-actions {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-        flex-shrink: 0;
+      .banner-description {
+        font-size: 16px;
+        line-height: 1.5;
+        opacity: 0.95;
+        color: white;
+        margin: 0;
       }
       
       .banner-button {
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
-        padding: 10px 20px;
-        border-radius: 25px;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 28px;
+        background-color: white;
+        color: #000080;
         text-decoration: none;
+        border-radius: 6px;
         font-weight: 600;
-        font-size: 0.9rem;
-        border: 2px solid rgba(255, 255, 255, 0.3);
+        font-size: 16px;
         transition: all 0.3s ease;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
+        white-space: nowrap;
+        flex-shrink: 0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
       }
       
       .banner-button:hover {
-        background: rgba(255, 255, 255, 0.3);
-        border-color: rgba(255, 255, 255, 0.5);
+        background-color: #f0f0f0;
         transform: translateY(-2px);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
       }
       
+      .banner-button:active {
+        transform: translateY(0);
+      }
       
-      /* Mobile responsive banner */
       @media (max-width: 768px) {
+        .maintenance-calculator-banner {
+          padding: 30px 15px;
+        }
+        
         .banner-content {
           flex-direction: column;
           text-align: center;
-          gap: 15px;
-          padding: 0 15px;
-        }
-        
-        .banner-text {
-          order: 2;
-        }
-        
-        .banner-actions {
-          order: 3;
-          justify-content: center;
+          gap: 20px;
         }
         
         .banner-icon {
-          order: 1;
-          font-size: 1.8rem;
+          font-size: 40px;
         }
         
         .banner-title {
-          font-size: 1.2rem;
+          font-size: 20px;
         }
         
-        .banner-subtitle {
-          font-size: 0.9rem;
+        .banner-description {
+          font-size: 14px;
         }
         
         .banner-button {
-          padding: 8px 16px;
-          font-size: 0.8rem;
+          width: 100%;
+          justify-content: center;
         }
       }
-      
     </style>
   </head>
   <body>
     <link rel="stylesheet" href="./style.css" />
+    
+    <!-- Maintenance Calculator Banner -->
+    <div class="maintenance-calculator-banner" style="display: block !important; visibility: visible !important; opacity: 1 !important; width: 100% !important;">
+      <div class="banner-content" style="display: flex !important; visibility: visible !important;">
+        <div class="banner-icon">🧮</div>
+        <div class="banner-text">
+          <h3 class="banner-title">Calculate Your Maintenance Charges</h3>
+          <p class="banner-description">Use our interactive calculator to determine your maintenance fees based on your block, door number, and handover date</p>
+        </div>
+        <a href="/maintenance-calculator.html" class="banner-button">
+          <span>Open Calculator</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+    
     <div>
       <link href="./index.css" rel="stylesheet" />
-
-      <!-- TAAOWA Elections Notification Banner -->
-      <div id="electionBanner" class="election-notification-banner">
-        <div class="banner-content">
-          <div class="banner-icon">🗳️</div>
-          <div class="banner-text">
-            <div class="banner-title">TAAOWA Elections 2025-27</div>
-            <div class="banner-subtitle">Election to the Board of Managers & Principal Officer - Now Open!</div>
-          </div>
-          <div class="banner-actions">
-            <a href="taaowa-elections-2025-27.html" class="banner-button">View Details</a>
-          </div>
-        </div>
-      </div>
 
       <div class="landing-page-container1">
         <div class="landing-page-top-container">
@@ -703,6 +727,7 @@
             </div>
           </div>
         </div>
+        
         <div class="landing-page-footer" style="text-align: center; width: 100%; margin: 0 auto; padding: 20px 0;">
           <div style="max-width: 800px; margin: 0 auto;">
             <p><b>The Ace Apartment Owners Welfare Association (TAAOWA)</b></p>
@@ -749,7 +774,6 @@
 
       
 
-      
       
       function openKidsModal() {
         console.log('openKidsModal called');
