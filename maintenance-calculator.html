@@ -123,7 +123,7 @@
       .iframe-wrapper {
         position: relative;
         width: 100%;
-        padding-bottom: 75%; /* 4:3 aspect ratio */
+        padding-bottom: 75%; /* 4:3 aspect ratio for desktop */
         height: 0;
         overflow: hidden;
         background-color: #f9f9f9;
@@ -137,6 +137,40 @@
         height: 100%;
         border: none;
         min-height: 800px;
+      }
+      
+      /* Mobile-friendly iframe adjustments */
+      @media (max-width: 768px) {
+        .iframe-wrapper {
+          padding-bottom: 150%; /* Taller aspect ratio for mobile */
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+        }
+        
+        .iframe-wrapper iframe {
+          min-height: 1200px;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+        }
+        
+        .calculator-container {
+          overflow: visible;
+        }
+      }
+      
+      @media (max-width: 480px) {
+        .iframe-wrapper {
+          padding-bottom: 200%;
+          height: auto;
+          min-height: 1500px;
+        }
+        
+        .iframe-wrapper iframe {
+          min-height: 1500px;
+          width: 100%;
+          height: auto;
+          position: relative;
+        }
       }
       
       .open-sheet-link {
@@ -186,17 +220,63 @@
           gap: 15px;
         }
         
-        .iframe-wrapper {
-          padding-bottom: 100%;
-        }
-        
-        .iframe-wrapper iframe {
-          min-height: 600px;
-        }
-        
         .main-container {
           margin: 15px auto;
           padding: 0 15px;
+        }
+        
+        .info-box {
+          padding: 15px;
+          font-size: 14px;
+        }
+        
+        .calculator-header {
+          padding: 15px;
+        }
+        
+        .calculator-header h2 {
+          font-size: 20px;
+        }
+        
+        .open-sheet-link {
+          padding: 15px;
+        }
+        
+        .open-sheet-link a {
+          display: flex;
+          width: 100%;
+          justify-content: center;
+        }
+      }
+      
+      @media (max-width: 480px) {
+        .page-title {
+          font-size: 20px;
+        }
+        
+        .page-subtitle {
+          font-size: 14px;
+        }
+        
+        .main-container {
+          padding: 0 10px;
+        }
+      }
+      
+      /* Mobile-specific message */
+      .mobile-notice {
+        display: none;
+        background-color: #fff3cd;
+        border: 1px solid #ffc107;
+        border-radius: 4px;
+        padding: 15px;
+        margin-bottom: 20px;
+        text-align: center;
+      }
+      
+      @media (max-width: 768px) {
+        .mobile-notice {
+          display: block;
         }
       }
     </style>
@@ -216,6 +296,10 @@
       <h1 class="page-title">Maintenance Calculator</h1>
       <p class="page-subtitle">Calculate your maintenance charges based on your block, door number, and handover date</p>
       
+      <div class="mobile-notice">
+        <p style="margin: 0; color: #856404;"><strong>📱 Mobile Tip:</strong> For the best experience on mobile devices, consider using the "Open in Google Sheets" link below for full functionality.</p>
+      </div>
+      
       <div class="info-box">
         <p><strong>Instructions:</strong></p>
         <p>Enter your block and door number in the calculator below. The rest of the fields will automatically calculate based on your handover date and square footage.</p>
@@ -230,9 +314,11 @@
         <div class="iframe-wrapper">
           <iframe 
             id="calculatorIframe"
-            src="https://docs.google.com/spreadsheets/d/1WKp5U0H6NDlOmU3JoHgfnBTCfgD_nAxCFJYOt687sk4/edit?usp=sharing"
+            src="https://docs.google.com/spreadsheets/d/1WKp5U0H6NDlOmU3JoHgfnBTCfgD_nAxCFJYOt687sk4/edit?usp=sharing&rm=minimal"
             frameborder="0"
             allowfullscreen
+            scrolling="yes"
+            style="overflow-x: auto; -webkit-overflow-scrolling: touch;"
             title="Maintenance Calculator">
           </iframe>
         </div>
@@ -255,11 +341,48 @@
       // 1. Shared publicly (View access for anyone with the link)
       // 2. Preferably published (File > Share > Publish to web) for best embedding results
       
-      // Adjust iframe height based on content if needed
+      // Adjust iframe height based on device
       const iframe = document.getElementById('calculatorIframe');
       if (iframe) {
-        // Set a reasonable minimum height
-        iframe.style.minHeight = '800px';
+        const isMobile = window.innerWidth <= 768;
+        const isSmallMobile = window.innerWidth <= 480;
+        
+        if (isSmallMobile) {
+          // For very small screens, use a tall scrollable container
+          iframe.style.minHeight = '1500px';
+          iframe.style.height = '1500px';
+        } else if (isMobile) {
+          // For tablets and larger phones
+          iframe.style.minHeight = '1200px';
+          iframe.style.height = '1200px';
+        } else {
+          // For desktop
+          iframe.style.minHeight = '800px';
+        }
+        
+        // Enable touch scrolling on mobile
+        if (isMobile) {
+          iframe.setAttribute('scrolling', 'yes');
+          iframe.style.overflowX = 'auto';
+          iframe.style.webkitOverflowScrolling = 'touch';
+        }
+        
+        // Handle resize
+        window.addEventListener('resize', function() {
+          const isMobileNow = window.innerWidth <= 768;
+          const isSmallMobileNow = window.innerWidth <= 480;
+          
+          if (isSmallMobileNow) {
+            iframe.style.minHeight = '1500px';
+            iframe.style.height = '1500px';
+          } else if (isMobileNow) {
+            iframe.style.minHeight = '1200px';
+            iframe.style.height = '1200px';
+          } else {
+            iframe.style.minHeight = '800px';
+            iframe.style.height = '100%';
+          }
+        });
       }
     </script>
   </body>
