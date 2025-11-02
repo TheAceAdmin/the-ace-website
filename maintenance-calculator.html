@@ -123,7 +123,7 @@
       .iframe-wrapper {
         position: relative;
         width: 100%;
-        padding-bottom: 75%; /* 4:3 aspect ratio for desktop */
+        padding-bottom: 75%; /* 4:3 aspect ratio */
         height: 0;
         overflow: hidden;
         background-color: #f9f9f9;
@@ -137,40 +137,6 @@
         height: 100%;
         border: none;
         min-height: 800px;
-      }
-      
-      /* Mobile-friendly iframe adjustments */
-      @media (max-width: 768px) {
-        .iframe-wrapper {
-          padding-bottom: 150%; /* Taller aspect ratio for mobile */
-          overflow-x: auto;
-          -webkit-overflow-scrolling: touch;
-        }
-        
-        .iframe-wrapper iframe {
-          min-height: 1200px;
-          overflow-x: auto;
-          -webkit-overflow-scrolling: touch;
-        }
-        
-        .calculator-container {
-          overflow: visible;
-        }
-      }
-      
-      @media (max-width: 480px) {
-        .iframe-wrapper {
-          padding-bottom: 200%;
-          height: auto;
-          min-height: 1500px;
-        }
-        
-        .iframe-wrapper iframe {
-          min-height: 1500px;
-          width: 100%;
-          height: auto;
-          position: relative;
-        }
       }
       
       .open-sheet-link {
@@ -197,6 +163,38 @@
         color: white;
       }
       
+      /* Mobile-only button at top */
+      .open-sheet-link-mobile {
+        display: none;
+        text-align: center;
+        margin: 20px 0;
+        padding: 0 15px;
+      }
+      
+      .open-sheet-link-mobile a {
+        color: #000080;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 15px 25px;
+        border: 2px solid #000080;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+        background-color: white;
+        width: 100%;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        font-size: 16px;
+      }
+      
+      .open-sheet-link-mobile a:active {
+        background-color: #000080;
+        color: white;
+        transform: scale(0.98);
+      }
+      
       .info-box {
         background-color: #e8f4f8;
         border-left: 4px solid #000080;
@@ -208,6 +206,21 @@
       .info-box p {
         margin: 5px 0;
         color: #333;
+      }
+      
+      .edit-notice {
+        background-color: #e7f3ff;
+        border-left: 4px solid #2196F3;
+        padding: 15px 20px;
+        margin: 20px 0;
+        border-radius: 4px;
+        text-align: center;
+      }
+      
+      .edit-notice p {
+        margin: 0;
+        color: #1565C0;
+        font-size: 14px;
       }
       
       @media (max-width: 768px) {
@@ -242,10 +255,12 @@
           padding: 15px;
         }
         
-        .open-sheet-link a {
-          display: flex;
-          width: 100%;
-          justify-content: center;
+        .open-sheet-link {
+          display: none; /* Hide desktop button on mobile */
+        }
+        
+        .open-sheet-link-mobile {
+          display: block; /* Show mobile button */
         }
       }
       
@@ -296,14 +311,31 @@
       <h1 class="page-title">Maintenance Calculator</h1>
       <p class="page-subtitle">Calculate your maintenance charges based on your block, door number, and handover date</p>
       
+      <!-- Mobile-only button at top -->
+      <div class="open-sheet-link-mobile">
+        <a href="https://docs.google.com/spreadsheets/d/1WKp5U0H6NDlOmU3JoHgfnBTCfgD_nAxCFJYOt687sk4/edit?gid=0#gid=0" target="_blank" rel="noopener noreferrer">
+          <span>📝 Open in Google Sheets (Recommended for Editing)</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+            <polyline points="15 3 21 3 21 9"></polyline>
+            <line x1="10" y1="14" x2="21" y2="3"></line>
+          </svg>
+        </a>
+      </div>
+      
       <div class="mobile-notice">
-        <p style="margin: 0; color: #856404;"><strong>📱 Mobile Tip:</strong> For the best experience on mobile devices, consider using the "Open in Google Sheets" link below for full functionality.</p>
+        <p style="margin: 0; color: #856404;"><strong>📱 Mobile Tip:</strong> Use the button above for the best editing experience on mobile devices.</p>
       </div>
       
       <div class="info-box">
         <p><strong>Instructions:</strong></p>
         <p>Enter your block and door number in the calculator below. The rest of the fields will automatically calculate based on your handover date and square footage.</p>
-        <p style="margin-top: 10px;"><em>Note: If the calculator doesn't display properly, please use the "Open in Google Sheets" link below to access it directly.</em></p>
+        <p style="margin-top: 10px;"><strong>⚠️ Important:</strong> To edit the calculator (use dropdowns, type inputs), you must:</p>
+        <ol style="margin-left: 20px; margin-top: 10px; padding-left: 0;">
+          <li>Be logged into your Google account</li>
+          <li>Make sure the sheet is shared with you (or use "Anyone with the link can edit")</li>
+          <li>If editing in the embedded view doesn't work, click "Open in Google Sheets" below for full functionality</li>
+        </ol>
       </div>
       
       <div class="calculator-container">
@@ -318,21 +350,32 @@
             frameborder="0"
             allowfullscreen
             scrolling="yes"
-            style="overflow-x: auto; -webkit-overflow-scrolling: touch;"
+            allow="clipboard-read; clipboard-write"
+            style="overflow-x: auto; -webkit-overflow-scrolling: touch; pointer-events: auto;"
             title="Maintenance Calculator">
           </iframe>
+        </div>
+        
+        <div class="edit-notice">
+          <p><strong>💡 Having trouble editing?</strong> Make sure you're logged into your Google account. For the best editing experience, use the "Open in Google Sheets" button below.</p>
         </div>
       </div>
       
       <div class="open-sheet-link">
-        <a href="https://docs.google.com/spreadsheets/d/1WKp5U0H6NDlOmU3JoHgfnBTCfgD_nAxCFJYOt687sk4/edit?gid=0#gid=0" target="_blank" rel="noopener noreferrer">
-          <span>Open in Google Sheets</span>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <a href="https://docs.google.com/spreadsheets/d/1WKp5U0H6NDlOmU3JoHgfnBTCfgD_nAxCFJYOt687sk4/edit?gid=0#gid=0" target="_blank" rel="noopener noreferrer" style="font-size: 18px; padding: 15px 30px;">
+          <span>📝 Open in Google Sheets (Recommended for Editing)</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
             <polyline points="15 3 21 3 21 9"></polyline>
             <line x1="10" y1="14" x2="21" y2="3"></line>
           </svg>
         </a>
+      </div>
+      
+      <div style="text-align: center; margin-top: 20px; padding: 15px; background-color: #f0f0f0; border-radius: 4px;">
+        <p style="margin: 0; color: #666; font-size: 14px;">
+          <strong>Note:</strong> The embedded calculator above may have limited interactivity. For full editing capabilities (dropdowns, cell editing), please use the "Open in Google Sheets" button above.
+        </p>
       </div>
     </div>
     
@@ -341,48 +384,10 @@
       // 1. Shared publicly (View access for anyone with the link)
       // 2. Preferably published (File > Share > Publish to web) for best embedding results
       
-      // Adjust iframe height based on device
+      // Set a reasonable minimum height
       const iframe = document.getElementById('calculatorIframe');
       if (iframe) {
-        const isMobile = window.innerWidth <= 768;
-        const isSmallMobile = window.innerWidth <= 480;
-        
-        if (isSmallMobile) {
-          // For very small screens, use a tall scrollable container
-          iframe.style.minHeight = '1500px';
-          iframe.style.height = '1500px';
-        } else if (isMobile) {
-          // For tablets and larger phones
-          iframe.style.minHeight = '1200px';
-          iframe.style.height = '1200px';
-        } else {
-          // For desktop
-          iframe.style.minHeight = '800px';
-        }
-        
-        // Enable touch scrolling on mobile
-        if (isMobile) {
-          iframe.setAttribute('scrolling', 'yes');
-          iframe.style.overflowX = 'auto';
-          iframe.style.webkitOverflowScrolling = 'touch';
-        }
-        
-        // Handle resize
-        window.addEventListener('resize', function() {
-          const isMobileNow = window.innerWidth <= 768;
-          const isSmallMobileNow = window.innerWidth <= 480;
-          
-          if (isSmallMobileNow) {
-            iframe.style.minHeight = '1500px';
-            iframe.style.height = '1500px';
-          } else if (isMobileNow) {
-            iframe.style.minHeight = '1200px';
-            iframe.style.height = '1200px';
-          } else {
-            iframe.style.minHeight = '800px';
-            iframe.style.height = '100%';
-          }
-        });
+        iframe.style.minHeight = '800px';
       }
     </script>
   </body>
