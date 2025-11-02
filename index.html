@@ -175,10 +175,26 @@
         cursor: pointer;
         transition: all 0.3s ease;
         margin-right: 15px;
+        display: inline-block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
       }
       
       .nav-rsvp-button:hover {
         background: rgba(0, 0, 128, 0.1);
+      }
+      
+      /* Ensure navigation container shows all buttons */
+      .landing-page-right-side1 {
+        display: flex !important;
+        align-items: center;
+        flex-direction: row;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      
+      .landing-page-right-side1 > div {
+        flex-shrink: 0;
       }
       
       /* Ensure buttons are clickable */
@@ -438,13 +454,27 @@
       }
       
       /* Show burger menu on mobile */
-      @media (max-width: 768px) {
+      @media (max-width: 991px) {
         .landing-page-burger-menu1 {
           display: block;
         }
         
         .landing-page-right-side1 {
-          display: none;
+          display: none !important;
+        }
+      }
+      
+      /* Ensure navigation bar has enough space */
+      @media (min-width: 992px) {
+        .landing-page-navbar {
+          flex-wrap: nowrap;
+          overflow: visible;
+        }
+        
+        .landing-page-right-side1 {
+          display: flex !important;
+          flex-wrap: wrap;
+          max-width: none;
         }
       }
       
@@ -457,10 +487,149 @@
         margin-bottom: 20px;
         line-height: 1.4;
       }
+      
+      /* Maintenance Calculator Banner */
+      .maintenance-calculator-banner {
+        width: 100% !important;
+        display: block !important;
+        visibility: visible !important;
+        background: linear-gradient(135deg, #000080 0%, #1a1a99 100%) !important;
+        padding: 40px 20px !important;
+        margin: 0 !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+        position: relative !important;
+        z-index: 1000 !important;
+        opacity: 1 !important;
+        min-height: auto !important;
+        overflow: visible !important;
+      }
+      
+      /* Ensure body doesn't hide banner */
+      body {
+        overflow-x: hidden;
+      }
+      
+      /* Make sure banner is first visible element */
+      body > .maintenance-calculator-banner {
+        position: relative !important;
+        display: block !important;
+      }
+      
+      .banner-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex !important;
+        align-items: center;
+        justify-content: space-between;
+        gap: 30px;
+        flex-wrap: wrap;
+        visibility: visible !important;
+      }
+      
+      .banner-icon {
+        font-size: 48px;
+        line-height: 1;
+        flex-shrink: 0;
+      }
+      
+      .banner-text {
+        flex: 1;
+        min-width: 250px;
+        color: white;
+      }
+      
+      .banner-title {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: white;
+      }
+      
+      .banner-description {
+        font-size: 16px;
+        line-height: 1.5;
+        opacity: 0.95;
+        color: white;
+        margin: 0;
+      }
+      
+      .banner-button {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 14px 28px;
+        background-color: white;
+        color: #000080;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        white-space: nowrap;
+        flex-shrink: 0;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+      
+      .banner-button:hover {
+        background-color: #f0f0f0;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+      }
+      
+      .banner-button:active {
+        transform: translateY(0);
+      }
+      
+      @media (max-width: 768px) {
+        .maintenance-calculator-banner {
+          padding: 30px 15px;
+        }
+        
+        .banner-content {
+          flex-direction: column;
+          text-align: center;
+          gap: 20px;
+        }
+        
+        .banner-icon {
+          font-size: 40px;
+        }
+        
+        .banner-title {
+          font-size: 20px;
+        }
+        
+        .banner-description {
+          font-size: 14px;
+        }
+        
+        .banner-button {
+          width: 100%;
+          justify-content: center;
+        }
+      }
     </style>
   </head>
   <body>
     <link rel="stylesheet" href="./style.css" />
+    
+    <!-- Maintenance Calculator Banner -->
+    <div class="maintenance-calculator-banner" style="display: block !important; visibility: visible !important; opacity: 1 !important; width: 100% !important;">
+      <div class="banner-content" style="display: flex !important; visibility: visible !important;">
+        <div class="banner-icon">🧮</div>
+        <div class="banner-text">
+          <h3 class="banner-title">Calculate Your Maintenance Charges</h3>
+          <p class="banner-description">Use our interactive calculator to determine your maintenance fees based on your block, door number, and handover date</p>
+        </div>
+        <a href="/maintenance-calculator.html" class="banner-button">
+          <span>Open Calculator</span>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+    
     <div>
       <link href="./index.css" rel="stylesheet" />
 
@@ -558,6 +727,7 @@
             </div>
           </div>
         </div>
+        
         <div class="landing-page-footer" style="text-align: center; width: 100%; margin: 0 auto; padding: 20px 0;">
           <div style="max-width: 800px; margin: 0 auto;">
             <p><b>The Ace Apartment Owners Welfare Association (TAAOWA)</b></p>
