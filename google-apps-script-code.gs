@@ -10,7 +10,7 @@
  * 6. Save the script
  * 7. Deploy > New deployment > Type: Web app
  * 8. Execute as: Me
- * 9. Who has access: Anyone
+ * 9. Who has access: Anyone (IMPORTANT: Must be "Anyone" for CORS to work)
  * 10. Click Deploy
  * 11. Copy the Web App URL and update it in property-tax-lookup.html
  */
@@ -22,41 +22,105 @@ const BILL_NUMBER_COLUMN = 2; // Column B (Bill Number)
 const PAYMENT_STATUS_COLUMN = 11; // Column K (Payment Status)
 
 /**
- * Main function to handle HTTP POST requests (for marking as paid)
+ * Main function to handle HTTP POST requests (for marking as paid and checking status)
  */
 function doPost(e) {
   try {
+    // Check if postData exists
+    if (!e || !e.postData || !e.postData.contents) {
+      return ContentService
+        .createTextOutput(JSON.stringify({ 
+          status: 'error',
+          data: { success: false, error: 'No request data received' }
+        }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    
     // Parse the request
-    const requestData = JSON.parse(e.postData.contents);
+    let requestData;
+    try {
+      requestData = JSON.parse(e.postData.contents);
+    } catch (parseError) {
+      return ContentService
+        .createTextOutput(JSON.stringify({ 
+          status: 'error',
+          data: { success: false, error: 'Invalid JSON in request: ' + parseError.toString() }
+        }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    
     const action = requestData.action;
     const billNumber = requestData.billNumber;
     
-    if (action !== 'markPaid' || !billNumber) {
+    if (!action || !billNumber) {
       return ContentService
-        .createTextOutput(JSON.stringify({ success: false, error: 'Invalid request' }))
-        .setMimeType(ContentService.MimeType.JSON)
-        .setHeaders({ 'Access-Control-Allow-Origin': '*' });
+        .createTextOutput(JSON.stringify({ 
+          status: 'error',
+          data: { success: false, error: 'Missing action or billNumber' }
+        }))
+        .setMimeType(ContentService.MimeType.JSON);
     }
     
-    // Update the sheet
-    const result = updatePaymentStatus(billNumber);
-    
-    if (result.success) {
+    // Check if SHEET_ID is configured
+    if (SHEET_ID === 'YOUR_SHEET_ID') {
       return ContentService
-        .createTextOutput(JSON.stringify({ success: true, message: 'Payment status updated' }))
-        .setMimeType(ContentService.MimeType.JSON)
-        .setHeaders({ 'Access-Control-Allow-Origin': '*' });
-    } else {
-      return ContentService
-        .createTextOutput(JSON.stringify({ success: false, error: result.error }))
-        .setMimeType(ContentService.MimeType.JSON)
-        .setHeaders({ 'Access-Control-Allow-Origin': '*' });
+        .createTextOutput(JSON.stringify({ 
+          status: 'error',
+          data: { success: false, error: 'SHEET_ID not configured. Please update the script with your Google Sheet ID.' }
+        }))
+        .setMimeType(ContentService.MimeType.JSON);
     }
+    
+    // Handle checkStatus action via POST (to avoid CORS issues with GET)
+    if (action === 'checkStatus') {
+      const status = getPaymentStatus(billNumber);
+      return ContentService
+        .createTextOutput(JSON.stringify({ 
+          status: 'success',
+          data: {
+            success: true, 
+            status: status || '',
+            billNumber: billNumber 
+          }
+        }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    // Handle markPaid action
+    if (action === 'markPaid') {
+      // Update the sheet
+      const result = updatePaymentStatus(billNumber);
+      
+      if (result.success) {
+        return ContentService
+          .createTextOutput(JSON.stringify({ 
+            status: 'success',
+            data: { success: true, message: 'Payment status updated' }
+          }))
+          .setMimeType(ContentService.MimeType.JSON);
+      } else {
+        return ContentService
+          .createTextOutput(JSON.stringify({ 
+            status: 'error',
+            data: { success: false, error: result.error }
+          }))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+    }
+    
+    return ContentService
+      .createTextOutput(JSON.stringify({ 
+        status: 'error',
+        data: { success: false, error: 'Unknown action' }
+      }))
+      .setMimeType(ContentService.MimeType.JSON);
   } catch (error) {
     return ContentService
-      .createTextOutput(JSON.stringify({ success: false, error: error.toString() }))
-      .setMimeType(ContentService.MimeType.JSON)
-      .setHeaders({ 'Access-Control-Allow-Origin': '*' });
+      .createTextOutput(JSON.stringify({ 
+        status: 'error',
+        data: { success: false, error: error.toString() }
+      }))
+      .setMimeType(ContentService.MimeType.JSON);
   }
 }
 
@@ -70,26 +134,39 @@ function doGet(e) {
     
     if (action === 'checkStatus' && billNumber) {
       const status = getPaymentStatus(billNumber);
-      return ContentService
+      const output = ContentService
         .createTextOutput(JSON.stringify({ 
-          success: true, 
-          status: status || '',
-          billNumber: billNumber 
+          status: 'success',
+          data: {
+            success: true, 
+            status: status || '',
+            billNumber: billNumber 
+          }
         }))
-        .setMimeType(ContentService.MimeType.JSON)
-        .setHeaders({ 'Access-Control-Allow-Origin': '*' });
+        .setMimeType(ContentService.MimeType.JSON);
+      
+      // Note: CORS headers are handled by Google Apps Script deployment settings
+      // Make sure "Who has access" is set to "Anyone" for CORS to work
+      return output;
     }
     
     return ContentService
       .createTextOutput('Property Tax Payment Status API is running. Use POST method to update payment status or GET with action=checkStatus&billNumber=XXX to check status.')
-      .setMimeType(ContentService.MimeType.TEXT)
-      .setHeaders({ 'Access-Control-Allow-Origin': '*' });
+      .setMimeType(ContentService.MimeType.TEXT);
   } catch (error) {
     return ContentService
       .createTextOutput(JSON.stringify({ success: false, error: error.toString() }))
-      .setMimeType(ContentService.MimeType.JSON)
-      .setHeaders({ 'Access-Control-Allow-Origin': '*' });
+      .setMimeType(ContentService.MimeType.JSON);
   }
+}
+
+/**
+ * Handle OPTIONS requests for CORS preflight
+ */
+function doOptions(e) {
+  return ContentService
+    .createTextOutput('')
+    .setMimeType(ContentService.MimeType.TEXT);
 }
 
 /**
@@ -98,10 +175,20 @@ function doGet(e) {
  */
 function getPaymentStatus(billNumber) {
   try {
+    // Check if SHEET_ID is configured
+    if (SHEET_ID === 'YOUR_SHEET_ID') {
+      Logger.log('SHEET_ID not configured');
+      return null;
+    }
+    
     // Open the spreadsheet
     const spreadsheet = SpreadsheetApp.openById(SHEET_ID);
-    const sheet = spreadsheet.getSheetByName(SHEET_NAME);
+    if (!spreadsheet) {
+      Logger.log('Spreadsheet not found with ID: ' + SHEET_ID);
+      return null;
+    }
     
+    const sheet = spreadsheet.getSheetByName(SHEET_NAME);
     if (!sheet) {
       Logger.log('Sheet not found: ' + SHEET_NAME);
       return null;
@@ -134,12 +221,20 @@ function getPaymentStatus(billNumber) {
  */
 function updatePaymentStatus(billNumber) {
   try {
+    // Check if SHEET_ID is configured
+    if (SHEET_ID === 'YOUR_SHEET_ID') {
+      return { success: false, error: 'SHEET_ID not configured. Please update the script with your Google Sheet ID.' };
+    }
+    
     // Open the spreadsheet
     const spreadsheet = SpreadsheetApp.openById(SHEET_ID);
-    const sheet = spreadsheet.getSheetByName(SHEET_NAME);
+    if (!spreadsheet) {
+      return { success: false, error: 'Spreadsheet not found. Please check your SHEET_ID.' };
+    }
     
+    const sheet = spreadsheet.getSheetByName(SHEET_NAME);
     if (!sheet) {
-      return { success: false, error: 'Sheet not found' };
+      return { success: false, error: 'Sheet "' + SHEET_NAME + '" not found. Please check your SHEET_NAME.' };
     }
     
     // Get all data
