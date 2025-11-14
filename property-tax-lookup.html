@@ -849,9 +849,12 @@
       }
       
       // Display property details
-      function displayPropertyDetails(property) {
+      async function displayPropertyDetails(property) {
         // Store current property
         currentProperty = property;
+        
+        // Check if already paid first to determine balance display
+        const isAlreadyPaid = await checkIfAlreadyPaid(property);
         
         // Display results
         document.getElementById('snoResult').textContent = property.sNo;
@@ -863,7 +866,10 @@
         document.getElementById('propertyUsageResult').textContent = property.propertyUsage;
         document.getElementById('currentTaxResult').textContent = formatCurrency(property.currentTax);
         document.getElementById('arrearTaxResult').textContent = formatCurrency(property.arrearTaxDue);
-        document.getElementById('balanceAmountResult').textContent = formatCurrency(property.balanceAmount);
+        
+        // If already paid, always show balance as 0
+        const balanceToDisplay = isAlreadyPaid ? 0 : property.balanceAmount;
+        document.getElementById('balanceAmountResult').textContent = formatCurrency(balanceToDisplay);
         
         // Update payment link
         updatePaymentLink(property.billNumber);
@@ -879,7 +885,7 @@
         markPaidButton.textContent = 'Checking status...';
         markPaidButton.style.backgroundColor = '#6c757d';
         
-        // Check if already paid and update button
+        // Update button state (already checked above, but this will finalize it)
         updatePaymentButtonState(property).then(() => {
           console.log('Payment status checked');
         });
