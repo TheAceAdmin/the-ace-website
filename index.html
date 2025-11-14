@@ -488,35 +488,35 @@
         line-height: 1.4;
       }
       
-      /* Maintenance Calculator Banner */
-      .maintenance-calculator-banner {
+      /* Banner Carousel */
+      .banner-carousel {
         width: 100% !important;
         display: block !important;
         visibility: visible !important;
-        background: linear-gradient(135deg, #000080 0%, #1a1a99 100%) !important;
-        padding: 40px 20px !important;
-        margin: 0 !important;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
         position: relative !important;
         z-index: 1000 !important;
-        opacity: 1 !important;
-        min-height: auto !important;
-        overflow: visible !important;
+        overflow: hidden !important;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
       }
       
-      /* Ensure body doesn't hide banner */
-      body {
-        overflow-x: hidden;
+      .banner-carousel-container {
+        display: flex;
+        transition: transform 0.5s ease-in-out;
+        will-change: transform;
       }
       
-      /* Make sure banner is first visible element */
-      body > .maintenance-calculator-banner {
-        position: relative !important;
-        display: block !important;
+      .banner-slide {
+        min-width: 100%;
+        background: linear-gradient(135deg, #000080 0%, #1a1a99 100%);
+        padding: 40px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
       }
       
       .banner-content {
         max-width: 1200px;
+        width: 100%;
         margin: 0 auto;
         display: flex !important;
         align-items: center;
@@ -580,8 +580,71 @@
         transform: translateY(0);
       }
       
+      /* Carousel Navigation */
+      .banner-nav {
+        position: absolute;
+        bottom: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 8px;
+        z-index: 10;
+      }
+      
+      .banner-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.5);
+        border: 2px solid rgba(255, 255, 255, 0.8);
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      
+      .banner-dot.active {
+        background-color: white;
+        width: 30px;
+        border-radius: 5px;
+      }
+      
+      .banner-arrow {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        font-size: 24px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        z-index: 10;
+      }
+      
+      .banner-arrow:hover {
+        background-color: rgba(255, 255, 255, 0.3);
+      }
+      
+      .banner-arrow.prev {
+        left: 15px;
+      }
+      
+      .banner-arrow.next {
+        right: 15px;
+      }
+      
+      /* Ensure body doesn't hide banner */
+      body {
+        overflow-x: hidden;
+      }
+      
       @media (max-width: 768px) {
-        .maintenance-calculator-banner {
+        .banner-slide {
           padding: 30px 15px;
         }
         
@@ -607,26 +670,94 @@
           width: 100%;
           justify-content: center;
         }
+        
+        .banner-arrow {
+          display: none; /* Hide arrows on mobile, use swipe instead */
+        }
+        
+        .banner-nav {
+          bottom: 10px;
+        }
+        
+        .banner-dot {
+          width: 8px;
+          height: 8px;
+        }
+        
+        .banner-dot.active {
+          width: 24px;
+        }
+      }
+      
+      @media (max-width: 480px) {
+        .banner-slide {
+          padding: 25px 12px;
+        }
+        
+        .banner-title {
+          font-size: 18px;
+        }
+        
+        .banner-description {
+          font-size: 13px;
+        }
+        
+        .banner-button {
+          padding: 12px 20px;
+          font-size: 14px;
+        }
       }
     </style>
   </head>
   <body>
     <link rel="stylesheet" href="./style.css" />
     
-    <!-- Maintenance Calculator Banner -->
-    <div class="maintenance-calculator-banner" style="display: block !important; visibility: visible !important; opacity: 1 !important; width: 100% !important;">
-      <div class="banner-content" style="display: flex !important; visibility: visible !important;">
-        <div class="banner-icon">🧮</div>
-        <div class="banner-text">
-          <h3 class="banner-title">Calculate Your Maintenance Charges</h3>
-          <p class="banner-description">Use our interactive calculator to determine your maintenance fees based on your block, door number, and handover date</p>
+    <!-- Banner Carousel -->
+    <div class="banner-carousel" id="bannerCarousel">
+      <div class="banner-carousel-container" id="bannerContainer">
+        <!-- Slide 1: Maintenance Calculator -->
+        <div class="banner-slide">
+          <div class="banner-content">
+            <div class="banner-icon">🧮</div>
+            <div class="banner-text">
+              <h3 class="banner-title">Calculate Your Maintenance Charges</h3>
+              <p class="banner-description">Use our interactive calculator to determine your maintenance fees based on your block, door number, and handover date</p>
+            </div>
+            <a href="/maintenance-calculator.html" class="banner-button">
+              <span>Open Calculator</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </a>
+          </div>
         </div>
-        <a href="/maintenance-calculator.html" class="banner-button">
-          <span>Open Calculator</span>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M5 12h14M12 5l7 7-7 7"/>
-          </svg>
-        </a>
+        
+        <!-- Slide 2: Property Tax Lookup -->
+        <div class="banner-slide">
+          <div class="banner-content">
+            <div class="banner-icon">🏠</div>
+            <div class="banner-text">
+              <h3 class="banner-title">Property Tax Lookup</h3>
+              <p class="banner-description">Search for your property tax details by block and door number. Check your tax status and mark payments as paid.</p>
+            </div>
+            <a href="/property-tax-lookup.html" class="banner-button">
+              <span>Check Property Tax</span>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M5 12h14M12 5l7 7-7 7"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Navigation Arrows -->
+      <button class="banner-arrow prev" id="prevBtn" aria-label="Previous banner">‹</button>
+      <button class="banner-arrow next" id="nextBtn" aria-label="Next banner">›</button>
+      
+      <!-- Navigation Dots -->
+      <div class="banner-nav">
+        <span class="banner-dot active" data-slide="0" aria-label="Go to slide 1"></span>
+        <span class="banner-dot" data-slide="1" aria-label="Go to slide 2"></span>
       </div>
     </div>
     
@@ -765,6 +896,116 @@
             document.body.style.overflow = 'auto';
           }
         });
+        
+        // Banner Carousel functionality
+        const bannerContainer = document.getElementById('bannerContainer');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const dots = document.querySelectorAll('.banner-dot');
+        let currentSlide = 0;
+        const totalSlides = 2;
+        let autoSlideInterval;
+        
+        // Function to update carousel position
+        function updateCarousel() {
+          bannerContainer.style.transform = `translateX(-${currentSlide * 100}%)`;
+          
+          // Update dots
+          dots.forEach((dot, index) => {
+            if (index === currentSlide) {
+              dot.classList.add('active');
+            } else {
+              dot.classList.remove('active');
+            }
+          });
+        }
+        
+        // Next slide
+        function nextSlide() {
+          currentSlide = (currentSlide + 1) % totalSlides;
+          updateCarousel();
+          resetAutoSlide();
+        }
+        
+        // Previous slide
+        function prevSlide() {
+          currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+          updateCarousel();
+          resetAutoSlide();
+        }
+        
+        // Go to specific slide
+        function goToSlide(slideIndex) {
+          currentSlide = slideIndex;
+          updateCarousel();
+          resetAutoSlide();
+        }
+        
+        // Auto-slide functionality (optional - auto-rotates every 5 seconds)
+        function startAutoSlide() {
+          autoSlideInterval = setInterval(nextSlide, 5000);
+        }
+        
+        function resetAutoSlide() {
+          clearInterval(autoSlideInterval);
+          startAutoSlide();
+        }
+        
+        // Event listeners for arrows
+        if (nextBtn) {
+          nextBtn.addEventListener('click', nextSlide);
+        }
+        if (prevBtn) {
+          prevBtn.addEventListener('click', prevSlide);
+        }
+        
+        // Event listeners for dots
+        dots.forEach((dot, index) => {
+          dot.addEventListener('click', () => goToSlide(index));
+        });
+        
+        // Touch/swipe support for mobile
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        bannerContainer.addEventListener('touchstart', function(e) {
+          touchStartX = e.changedTouches[0].screenX;
+        }, { passive: true });
+        
+        bannerContainer.addEventListener('touchend', function(e) {
+          touchEndX = e.changedTouches[0].screenX;
+          handleSwipe();
+        }, { passive: true });
+        
+        function handleSwipe() {
+          const swipeThreshold = 50; // Minimum distance for a swipe
+          const diff = touchStartX - touchEndX;
+          
+          if (Math.abs(diff) > swipeThreshold) {
+            if (diff > 0) {
+              // Swipe left - next slide
+              nextSlide();
+            } else {
+              // Swipe right - previous slide
+              prevSlide();
+            }
+          }
+        }
+        
+        // Start auto-slide
+        startAutoSlide();
+        
+        // Pause auto-slide on hover (desktop)
+        const carousel = document.getElementById('bannerCarousel');
+        if (carousel) {
+          carousel.addEventListener('mouseenter', () => {
+            clearInterval(autoSlideInterval);
+          });
+          
+          carousel.addEventListener('mouseleave', () => {
+            startAutoSlide();
+          });
+        }
       });
       
 
