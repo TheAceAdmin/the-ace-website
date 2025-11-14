@@ -57,10 +57,16 @@ This guide will help you set up the Property Tax Lookup system that allows resid
 9. Configure the deployment:
    - **Description**: Property Tax Payment Status Updater
    - **Execute as**: Me
-   - **Who has access**: Anyone
+   - **Who has access**: **Anyone** (IMPORTANT: Must be "Anyone", not "Anyone with Google account" - this is required for CORS to work)
 10. Click **Deploy**
 11. **Copy the Web App URL** that appears (you'll need this in the next step)
 12. Click **Authorize access** and follow the prompts to grant permissions
+
+**IMPORTANT - CORS Configuration:**
+- The "Who has access" setting MUST be set to "Anyone" (not "Anyone with Google account")
+- This is required for CORS (Cross-Origin Resource Sharing) to work properly
+- If you see CORS errors in the browser console, redeploy the script with "Anyone" access
+- After redeploying, you may need to create a new deployment version
 
 ### Step 3: Update the HTML File
 
