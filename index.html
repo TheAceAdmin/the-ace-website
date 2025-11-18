@@ -787,7 +787,7 @@
                   </a>
                 </div>
                 <div>
-                  <a href="https://www.aceapartment.org/revenue-leads-form.html">
+                  <a href="https://www.aceapartment.org/business-opportunities.html">
                     <button class="nav-rsvp-button">
                       <span>Business Opportunities</span>
                     </button>
@@ -845,7 +845,7 @@
                         <span>Tenant Form</span>
                       </button>
                     </a>
-                    <a href="https://www.aceapartment.org/revenue-leads-form.html" class="landing-page-link10" style="text-decoration: none;">
+                    <a href="https://www.aceapartment.org/business-opportunities.html" class="landing-page-link10" style="text-decoration: none;">
                       <button class="solid-button-button button" style="width: 100%; padding: 12px 20px; font-size: 16px; background-color: #4CAF50; color: white; border: none;">
                         <span>Business Opportunities</span>
                       </button>
@@ -888,17 +888,26 @@
         const burgerMenu = document.querySelector('[data-role="BurgerMenu"]');
         const mobileMenu = document.querySelector('[data-role="MobileMenu"]');
         const closeMenu = document.querySelector('[data-role="CloseMobileMenu"]');
+        const bannerCarousel = document.getElementById('bannerCarousel');
         
         // Open mobile menu
         burgerMenu.addEventListener('click', function() {
           mobileMenu.style.display = 'block';
           document.body.style.overflow = 'hidden';
+          // Hide banner when menu opens
+          if (bannerCarousel) {
+            bannerCarousel.style.display = 'none';
+          }
         });
         
         // Close mobile menu
         closeMenu.addEventListener('click', function() {
           mobileMenu.style.display = 'none';
           document.body.style.overflow = 'auto';
+          // Show banner when menu closes
+          if (bannerCarousel) {
+            bannerCarousel.style.display = 'block';
+          }
         });
         
         // Close mobile menu when clicking outside
@@ -906,6 +915,10 @@
           if (e.target === mobileMenu) {
             mobileMenu.style.display = 'none';
             document.body.style.overflow = 'auto';
+            // Show banner when menu closes
+            if (bannerCarousel) {
+              bannerCarousel.style.display = 'block';
+            }
           }
         });
         
