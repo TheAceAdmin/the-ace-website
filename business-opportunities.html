@@ -321,17 +321,7 @@
                         throw new Error(`Submission failed. ${hint}`);
                     }
 
-                    let resultMessage = 'Lead submitted successfully! We will review and contact you soon.';
-                    try {
-                        if (rawText && rawText.trim().length) {
-                            const json = JSON.parse(rawText);
-                            if (json && json.message) {
-                                resultMessage = json.message;
-                            }
-                        }
-                    } catch (err) {
-                        console.warn('[Lead Submission] Response was not JSON. Using default success message.');
-                    }
+                    let resultMessage = 'Submitted successfully! We will review and contact you soon.';
 
                     setSubmitStatus({ 
                         type: 'success', 
