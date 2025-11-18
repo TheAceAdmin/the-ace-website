@@ -499,6 +499,12 @@
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
       }
       
+      /* Hide banner when mobile menu is open */
+      .banner-carousel.menu-open {
+        display: none !important;
+        visibility: hidden !important;
+      }
+      
       .banner-carousel-container {
         display: flex;
         transition: transform 0.5s ease-in-out;
@@ -866,7 +872,7 @@
               <h1 class="Heading landing-page-text15">
                 Celebrate. Live. Love. Together.
               </h1>
-              <h2 class="landing-page-subheading">At THE ACE</h2>
+              <h2 class="landing-page-subheading">at THE ACE</h2>
             </div>
           </div>
         </div>
@@ -896,7 +902,7 @@
           document.body.style.overflow = 'hidden';
           // Hide banner when menu opens
           if (bannerCarousel) {
-            bannerCarousel.style.display = 'none';
+            bannerCarousel.classList.add('menu-open');
           }
         });
         
@@ -906,7 +912,7 @@
           document.body.style.overflow = 'auto';
           // Show banner when menu closes
           if (bannerCarousel) {
-            bannerCarousel.style.display = 'block';
+            bannerCarousel.classList.remove('menu-open');
           }
         });
         
@@ -917,7 +923,7 @@
             document.body.style.overflow = 'auto';
             // Show banner when menu closes
             if (bannerCarousel) {
-              bannerCarousel.style.display = 'block';
+              bannerCarousel.classList.remove('menu-open');
             }
           }
         });
