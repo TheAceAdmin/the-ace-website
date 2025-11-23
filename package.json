@@ -4,10 +4,12 @@
   "private": true,
   "description": "The ACE Independence Day Event Website",
   "scripts": {
-    "dev": "npx http-server . -p 3001 -o --cors",
-    "start": "npx http-server . -p 3001 --cors",
+    "dev": "wrangler dev",
+    "start": "wrangler dev",
     "deploy": "wrangler deploy"
   },
-  "devDependencies": {},
-  "dependencies": {}
+  "devDependencies": {
+    "terser": "^5.44.1",
+    "wrangler": "^3.114.15"
+  }
 }
