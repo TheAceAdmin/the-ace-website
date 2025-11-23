@@ -14,12 +14,3 @@
 /styles/*    /styles/:splat    200
 /scripts/*   /scripts/:splat   200
 
-# Root path
-/    /index.html    200
-
-# Explicitly handle index.html to avoid loop
-/index.html    /index.html    200
-
-# Catch-all: serve index.html for unknown routes (but not for existing files)
-# Note: This will only trigger for paths that don't match existing files
-
