@@ -1,0 +1,37 @@
+# Dependencies - MUST EXCLUDE (causes deployment errors)
+node_modules/
+package-lock.json
+
+# Git files
+.git/
+.gitignore
+
+# Development files
+*.log
+.DS_Store
+.env
+.env.local
+.env.*.local
+
+# Build files
+dist/
+build/
+.wrangler/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Documentation (optional - remove if you need docs/)
+docs/
+*.md
+
+# Backend files (if not needed in deployment)
+backend/
+
+# Source files (if you have a src/ directory that's not needed)
+src/
+
