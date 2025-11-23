@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Business Opportunities - THE ACE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        .ace-page {
+            min-height: 100vh;
+            background-color: #f5f5f5;
+            font-family: 'Poppins', sans-serif;
+        }
+        .ace-header {
+            background-color: #ffffff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .ace-header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+        .ace-logo-block {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .ace-back-button {
+            padding: 10px 20px;
+            background-color: #000080;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+        .ace-back-button:hover {
+            background-color: #000060;
+        }
+        .ace-main-container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+        .ace-page-title {
+            text-align: center;
+            color: #000080;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        .ace-page-subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+        .ace-form-container {
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 20px;
+        }
+        .ace-lead-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .ace-two-column-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .ace-button-row {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+        }
+        .ace-reset-button {
+            padding: 15px 30px;
+            border-radius: 4px;
+            border: 2px solid #000080;
+            color: #000080;
+            background: transparent;
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .ace-reset-button:hover {
+            background: rgba(0, 0, 128, 0.1);
+            transform: scale(0.98);
+        }
+        .ace-submit-button {
+            padding: 15px 30px;
+            border-radius: 4px;
+            background: #000080;
+            border: none;
+            color: #ffffff;
+            font-family: 'Poppins', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            width: 100%;
+        }
+        .ace-submit-button:not(.ace-submit-button--disabled):hover {
+            background: #000060;
+            transform: scale(0.98);
+        }
+        .ace-submit-button--disabled {
+            background: #999;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .ace-info-box {
+            background-color: #e8f4f8;
+            border-left: 4px solid #000080;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        .ace-terms {
+            background-color: #fff7ec;
+            border-left: 4px solid #bf4408;
+            padding: 20px;
+            margin: 30px 0;
+            border-radius: 4px;
+            color: #5a2b00;
+        }
+        @media (max-width: 768px) {
+            .ace-header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .ace-back-button {
+                width: 100%;
+                text-align: center;
+            }
+            .ace-main-container {
+                margin: 20px auto;
+                padding: 0 15px;
+            }
+            .ace-form-container {
+                padding: 20px;
+            }
+            .ace-lead-grid,
+            .ace-two-column-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+            .ace-button-row {
+                flex-direction: column;
+            }
+            .ace-reset-button,
+            .ace-submit-button {
+                width: 100%;
+            }
+        }
+        @media (max-width: 480px) {
+            .ace-page-title {
+                font-size: 24px;
+            }
+            .ace-page-subtitle {
+                font-size: 14px;
+            }
+            .ace-form-container {
+                padding: 15px;
+            }
+            .ace-info-box,
+            .ace-terms {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel" src="../scripts/business-opportunities.jsx"></script>
+</body>
+</html>

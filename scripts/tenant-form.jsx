@@ -1,0 +1,1324 @@
+  function App() {
+const [data, setData] = React.useState({
+    tenantTitle: "Mr",
+    tenantName: "",
+    age: "",
+    occupation: "",
+    block: "",
+    flatNo: "",
+    areaSqft: "",
+    mobile: "",
+    email: "",
+    buildingName: "The ACE",
+    addressLine: "The ACE, No.1, Corporation Road, Perungudi, Chennai, Tamil Nadu 600096",
+    owners: [{
+        name: "",
+        title: "Mr",
+        age: "",
+        occupation: "",
+        mobile: "",
+        email: "",
+        details: "",
+        location: "",
+        signatureDataUrl: "",
+        canvasSignatureUrl: "",
+        photoUrl: ""
+    }],
+    rentAmount: "",
+    securityDeposit: "",
+    leaseStartDate: "",
+    leaseEndDate: "",
+    place: "",
+    date: "",
+    photoUrl: "",
+    signatureDataUrl: "",
+    canvasSignatureUrl: "",
+    jointUndertaking: "",
+});
+
+const [showAssociationSignBox, setShowAssociationSignBox] = React.useState(false);
+const [showFAQ, setShowFAQ] = React.useState(false);
+const [savedForms, setSavedForms] = React.useState([]);
+const [showSavedForms, setShowSavedForms] = React.useState(false);
+const [currentFormId, setCurrentFormId] = React.useState(null);
+
+// Load saved forms from localStorage on component mount
+React.useEffect(() => {
+    const saved = localStorage.getItem('aceTenantForms');
+    if (saved) {
+        try {
+            const parsedData = JSON.parse(saved);
+            setSavedForms(parsedData);
+        } catch (e) {
+            console.error('Error loading saved forms:', e);
+        }
+    }
+}, []);
+
+
+
+// Save current form data
+function saveForm() {
+    console.log('Save form function called');
+    console.log('Current data:', data);
+    
+    const formName = prompt('Enter a name for this form:');
+    if (!formName || !formName.trim()) {
+        console.log('No form name provided, cancelling save');
+        return;
+    }
+    
+    console.log('Saving form with name:', formName);
+    
+    const formData = {
+        id: Date.now(),
+        name: formName.trim(),
+        data: { ...data },
+        createdAt: new Date().toISOString(),
+        lastModified: new Date().toISOString()
+    };
+    
+    console.log('Form data to save:', formData);
+    
+    const updatedForms = [...savedForms, formData];
+    setSavedForms(updatedForms);
+    setCurrentFormId(formData.id);
+    localStorage.setItem('aceTenantForms', JSON.stringify(updatedForms));
+    
+    console.log('Form saved successfully');
+}
+
+// Auto-save function
+function autoSave() {
+    if (currentFormId) {
+        const updatedForms = savedForms.map(form => 
+            form.id === currentFormId 
+                ? { ...form, data: { ...data }, lastModified: new Date().toISOString() }
+                : form
+        );
+        setSavedForms(updatedForms);
+        localStorage.setItem('aceTenantForms', JSON.stringify(updatedForms));
+    }
+}
+
+// Load a saved form
+function loadForm(formId) {
+    const form = savedForms.find(f => f.id === formId);
+    if (form) {
+        setData({ ...form.data });
+        setCurrentFormId(formId);
+        setShowSavedForms(false);
+    }
+}
+
+// Delete a saved form
+function deleteForm(formId) {
+    const form = savedForms.find(f => f.id === formId);
+    if (form) {
+        const updatedForms = savedForms.filter(f => f.id !== formId);
+        setSavedForms(updatedForms);
+        if (currentFormId === formId) {
+            setCurrentFormId(null);
+        }
+        localStorage.setItem('aceTenantForms', JSON.stringify(updatedForms));
+    }
+}
+
+// Auto-save when important fields change (only if form was previously saved)
+React.useEffect(() => {
+    if (currentFormId) {
+        const timeoutId = setTimeout(autoSave, 1000); // Debounce auto-save
+        return () => clearTimeout(timeoutId);
+    }
+}, [data.owners, data.block, data.flatNo, data.areaSqft, data.leaseStartDate, data.leaseEndDate, data.place]);
+
+function update(field, value) {
+    setData(d => ({ ...d, [field]: value }));
+}
+
+function setOwner(index, field, value) {
+    setData(d => ({
+        ...d,
+        owners: d.owners.map((owner, i) => 
+            i === index ? { ...owner, [field]: value } : owner
+        )
+    }));
+}
+
+function addOwnerRow() {
+    setData((d) => ({ ...d, owners: [...d.owners, {
+        name: "",
+        title: "Mr",
+        age: "",
+        occupation: "",
+        mobile: "",
+        email: "",
+        details: "",
+        location: "",
+        signatureDataUrl: "",
+        canvasSignatureUrl: "",
+        photoUrl: ""
+    }] }));
+}
+
+function removeOwnerRow(index) {
+    setData(d => ({ ...d, owners: d.owners.filter((_, i) => i !== index) }));
+}
+
+function saveAsPDF() {
+    // Always auto-save before saving as PDF
+    const defaultName = "tenant-form-auto-save";
+    
+    // Check if a form with this name already exists
+    const existingFormIndex = savedForms.findIndex(form => form.name === defaultName);
+    
+    if (existingFormIndex !== -1) {
+        // Override existing form with same name
+        const updatedForms = [...savedForms];
+        updatedForms[existingFormIndex] = {
+            ...updatedForms[existingFormIndex],
+            data: { ...data },
+            lastModified: new Date().toISOString()
+        };
+        setSavedForms(updatedForms);
+        setCurrentFormId(updatedForms[existingFormIndex].id);
+        localStorage.setItem('aceTenantForms', JSON.stringify(updatedForms));
+    } else {
+        // Create new form with default name
+        const formData = {
+            id: Date.now(),
+            name: defaultName,
+            data: { ...data },
+            createdAt: new Date().toISOString(),
+            lastModified: new Date().toISOString()
+        };
+        
+        const updatedForms = [...savedForms, formData];
+        setSavedForms(updatedForms);
+        setCurrentFormId(formData.id);
+        localStorage.setItem('aceTenantForms', JSON.stringify(updatedForms));
+    }
+    
+    // Try to use browser's built-in print function
+    try {
+        window.print();
+    } catch (error) {
+        console.error('Print function failed:', error);
+        showMobilePrintInstructions();
+    }
+}
+
+function showMobilePrintInstructions() {
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    
+    if (isMobile) {
+        const instructions = `
+📱 Mobile Device Detected
+
+If the print dialog doesn't open or you can't save as PDF, try these steps:
+
+📱 iOS (iPhone/iPad):
+1. Tap the Share button (square with arrow up)
+2. Scroll down and tap "Print"
+3. In the print preview, tap the share button again
+4. Choose "Save to Files" or "Save to Photos"
+5. Select location and save
+
+🤖 Android:
+1. Tap the three dots menu (⋮)
+2. Select "Print" or "Share"
+3. Choose "Save as PDF" or "Print to PDF"
+4. Select save location
+
+💡 Alternative Method:
+• Take a screenshot of the form
+• Use your device's built-in PDF converter
+• Or email the form to yourself and save from email
+
+🔄 Try Again:
+• Refresh the page and try again
+• Or use a different browser (Chrome, Safari, Firefox)
+        `;
+        
+        alert(instructions);
+    } else {
+        alert('Print function failed. Please try refreshing the page or use a different browser.');
+    }
+}
+
+// Owner signature functions (copied from working membership form)
+function startOwnerSignature(evt, ownerIndex) {
+    evt.preventDefault();
+    console.log('startOwnerSignature called for index:', ownerIndex, 'Event type:', evt.type);
+    
+    const canvas = evt.target;
+    const ctx = canvas.getContext("2d");
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = "#111";
+    
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const clientX = evt.clientX ?? (evt.touches && evt.touches[0]?.clientX);
+    const clientY = evt.clientY ?? (evt.touches && evt.touches[0]?.clientY);
+    const x = (clientX - rect.left) * scaleX;
+    const y = (clientY - rect.top) * scaleY;
+    
+    console.log('Canvas dimensions:', canvas.width, 'x', canvas.height);
+    console.log('Rect dimensions:', rect.width, 'x', rect.height);
+    console.log('Scale factors:', scaleX, scaleY);
+    console.log('Client coordinates:', clientX, clientY);
+    console.log('Calculated coordinates:', x, y);
+    
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    canvas.ownerLastPoint = { x, y };
+}
+
+function moveOwnerSignature(evt, ownerIndex) {
+    const canvas = evt.target;
+    if (!canvas.ownerLastPoint) return;
+    
+    const ctx = canvas.getContext("2d");
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const clientX = evt.clientX ?? (evt.touches && evt.touches[0]?.clientX);
+    const clientY = evt.clientY ?? (evt.touches && evt.touches[0]?.clientY);
+    const x = (clientX - rect.left) * scaleX;
+    const y = (clientY - rect.top) * scaleY;
+    
+    console.log('Drawing line to:', x, y);
+    
+    ctx.lineTo(x, y);
+    ctx.stroke();
+    canvas.ownerLastPoint = { x, y };
+}
+
+function endOwnerSignature(evt, ownerIndex) {
+    const canvas = evt.target;
+    if (!canvas.ownerLastPoint) return;
+    
+    const url = canvas.toDataURL("image/png");
+    setOwner(ownerIndex, "canvasSignatureUrl", url);
+    canvas.ownerLastPoint = null;
+}
+
+function clearOwnerSignature(ownerIndex) {
+    // Clear the canvas and canvas signature data, but keep uploaded signature
+    const canvas = document.querySelector(`canvas[data-owner-index="${ownerIndex}"]`);
+    if (canvas) {
+        const ctx = canvas.getContext("2d");
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+    // Clear the canvas signature data but keep uploaded signature
+    setOwner(ownerIndex, "canvasSignatureUrl", "");
+}
+
+// Main signature functions (copied from working membership form)
+const canvasRef = React.useRef(null);
+const isDrawingRef = React.useRef(false);
+const lastPointRef = React.useRef({ x: 0, y: 0 });
+
+function getCanvasPoint(evt) {
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+    
+    // Get the canvas scaling factor (CSS size vs actual canvas size)
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
+    
+    // Calculate mouse position relative to canvas
+    const clientX = evt.clientX ?? (evt.touches && evt.touches[0]?.clientX);
+    const clientY = evt.clientY ?? (evt.touches && evt.touches[0]?.clientY);
+    
+    const cx = (clientX - rect.left) * scaleX;
+    const cy = (clientY - rect.top) * scaleY;
+    
+    return { x: cx, y: cy };
+}
+
+function startDraw(evt) {
+    if (!canvasRef.current) return;
+    evt.preventDefault(); // Prevent default touch behavior
+    isDrawingRef.current = true;
+    const p = getCanvasPoint(evt);
+    lastPointRef.current = p;
+}
+
+function moveDraw(evt) {
+    if (!isDrawingRef.current || !canvasRef.current) return;
+    evt.preventDefault();
+    const ctx = canvasRef.current.getContext("2d");
+    ctx.lineWidth = 2;
+    ctx.lineCap = "round";
+    ctx.lineJoin = "round";
+    ctx.strokeStyle = "#111";
+    const p = getCanvasPoint(evt);
+    ctx.beginPath();
+    ctx.moveTo(lastPointRef.current.x, lastPointRef.current.y);
+    ctx.lineTo(p.x, p.y);
+    ctx.stroke();
+    lastPointRef.current = p;
+}
+
+function endDraw() {
+    if (!canvasRef.current) return;
+    isDrawingRef.current = false;
+    const url = canvasRef.current.toDataURL("image/png");
+    update("canvasSignatureUrl", url);
+}
+
+function clearSignature() {
+    if (!canvasRef.current) return;
+    const ctx = canvasRef.current.getContext("2d");
+    ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+    // Clear the canvas signature data but keep uploaded signature
+    update("canvasSignatureUrl", "");
+}
+
+// Smoke tests
+React.useEffect(() => {
+    const results = [];
+    results.push({ name: "Form loaded", pass: true });
+    results.push({ name: "Tenant form visible", pass: !!document.querySelector('[data-testid="tenant-form"]') });
+    results.push({ name: "PDF button visible", pass: !!document.querySelector('[data-testid="print-button"]') });
+    results.push({ name: "Tenant signature area visible", pass: !!document.querySelector('[data-testid="signature-tenant"]') });
+    const assocVisible = !!document.querySelector('[data-testid="signature-association"]');
+    results.push({ name: "Association signature default hidden", pass: !assocVisible });
+    
+    console.log("Smoke test results:", results);
+}, []);
+
+return (
+    <div className="min-h-screen bg-gray-50">
+        {/* Header */}
+        <div className="bg-white shadow-sm border-b print:hidden">
+            <div className="max-w-6xl mx-auto px-4 py-4">
+                <div className="flex flex-col items-center gap-3">
+                    <div className="flex items-center gap-4">
+                        <img src="../assets/images/taaowa-logo.jpeg" alt="THE ACE Logo" className="h-12 w-12 object-contain" />
+                        <div>
+                            <h1 className="text-xl font-bold text-gray-800">THE ACE APARTMENT OWNERS WELFARE ASSOCIATION</h1>
+                            <p className="text-sm text-gray-600">(Reg. No.Chennai South/175/2025. Under TN Apartment Ownership Act 2022)</p>
+                        </div>
+                    </div>
+                    <div className="flex gap-2">
+                        <a href="https://www.aceapartment.org/" className="rounded-2xl px-3 py-2 bg-gray-600 text-white shadow hover:shadow-md active:scale-[.99] text-sm">← Back to Home</a>
+                        <button 
+                            onClick={saveForm} 
+                            className="rounded-2xl px-3 py-2 bg-green-600 text-white shadow hover:shadow-md active:scale-[.99] text-sm"
+                        >
+                            💾 Save Form
+                        </button>
+                        <button onClick={() => setShowSavedForms(!showSavedForms)} className="rounded-2xl px-3 py-2 bg-blue-600 text-white shadow hover:shadow-md active:scale-[.99] text-sm">📁 Load Form</button>
+                        <button data-testid="print-button" onClick={saveAsPDF} className="rounded-2xl px-3 py-2 bg-black text-white shadow hover:shadow-md active:scale-[.99] text-sm">Save as PDF</button>
+                        {currentFormId && (
+                            <div className="flex items-center gap-2 px-2 py-1 bg-green-100 text-green-800 rounded-lg text-xs">
+                                <span className="animate-pulse">💾</span>
+                                Auto-saved
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {/* Main layout */}
+        <div className="mx-auto max-w-6xl grid lg:grid-cols-2 gap-6 p-4">
+            {/* Form column */}
+            <section className="print:hidden" data-testid="tenant-form">
+                <div className="rounded-2xl bg-white p-4 shadow-sm">
+                    <h2 className="text-lg font-semibold">Building details</h2>
+
+                    <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                            <label className="text-sm font-medium">Block</label>
+                            <select value={data.block} onChange={(e) => update("block", e.target.value)} className="mt-1 w-full rounded-xl border p-2">
+                                <option value="">Select Block</option>
+                                <option value="A">A</option>
+                                <option value="B">B</option>
+                                <option value="C">C</option>
+                                <option value="D">D</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label className="text-sm font-medium">Flat No</label>
+                            <input 
+                                value={data.flatNo} 
+                                onChange={(e) => {
+                                    const value = e.target.value;
+                                    if (/^\d*$/.test(value)) {
+                                        if (value.length <= 4) {
+                                            update("flatNo", value);
+                                        }
+                                    }
+                                }}
+                                onBlur={(e) => {
+                                    const value = e.target.value;
+                                    if (value.length >= 3 && value.length <= 4) {
+                                        const firstTwo = parseInt(value.substring(0, 2));
+                                        const lastTwo = parseInt(value.substring(value.length - 2));
+                                        
+                                        // Updated validation: Allow floor numbers 1-99 and flat numbers 01-99
+                                        if (firstTwo < 1 || firstTwo > 99 || lastTwo < 1 || lastTwo > 99) {
+                                            e.target.style.borderColor = '#ef4444';
+                                            e.target.style.backgroundColor = '#fef2f2';
+                                            e.target.style.color = '#dc2626';
+                                        } else {
+                                            e.target.style.borderColor = '';
+                                            e.target.style.backgroundColor = '';
+                                            e.target.style.color = '';
+                                        }
+                                    }
+                                }}
+                                onFocus={(e) => {
+                                    e.target.style.borderColor = '';
+                                    e.target.style.backgroundColor = '';
+                                    e.target.style.color = '';
+                                }}
+                                className="mt-1 w-full rounded-xl border p-2 transition-colors duration-200" 
+                                placeholder="e.g., 1201 (3-4 digits)" 
+                                pattern="[0-9]{3,4}"
+                                title="Enter 3-4 digits. First 2 digits: 1-99, Last 2 digits: 01-99"
+                            />
+                            <div className="text-xs text-gray-500 mt-1">
+                                Format: 3-4 digits. First 2 digits (1-99), Last 2 digits (01-99)
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div className="mt-6">
+                        <h3 className="font-semibold mb-4">Member details</h3>
+                        
+                        <div className="space-y-6">
+                            {data.owners.map((owner, index) => (
+                                <div key={index} className="border rounded-xl p-6 bg-white shadow-sm">
+                                    <div className="flex items-center justify-between mb-4">
+                                        <h4 className="font-medium text-lg text-gray-800">
+                                            {index === 0 ? "Primary Member" : `Member ${index}`}
+                                        </h4>
+                                        {data.owners.length > 1 && (
+                                            <button 
+                                                onClick={() => removeOwnerRow(index)} 
+                                                className="text-red-600 hover:text-red-800 text-sm font-medium"
+                                            >
+                                                Remove
+                                            </button>
+                                        )}
+                                    </div>
+                                    
+                                    {/* Personal Details */}
+                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                                        <div>
+                                            <label className="text-sm font-medium text-gray-700">Title</label>
+                                            <select 
+                                                className="mt-1 w-full rounded-lg border p-3 bg-white" 
+                                                value={owner.title || "Mr"} 
+                                                onChange={(e) => setOwner(index, "title", e.target.value)}
+                                            >
+                                                <option value="Mr">Mr</option>
+                                                <option value="Mrs">Mrs</option>
+                                                <option value="Ms">Ms</option>
+                                            </select>
+                                        </div>
+                                        <div>
+                                            <label className="text-sm font-medium text-gray-700">Full Name</label>
+                                            <input 
+                                                className="mt-1 w-full rounded-lg border p-3" 
+                                                value={owner.name} 
+                                                onChange={(e) => setOwner(index, "name", e.target.value)}
+                                                placeholder="Enter full name"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-sm font-medium text-gray-700">Age</label>
+                                            <input 
+                                                className="mt-1 w-full rounded-lg border p-3" 
+                                                value={owner.age} 
+                                                onChange={(e) => setOwner(index, "age", e.target.value)}
+                                                placeholder="Years"
+                                                type="number"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-sm font-medium text-gray-700">Occupation</label>
+                                            <input 
+                                                className="mt-1 w-full rounded-lg border p-3" 
+                                                value={owner.occupation} 
+                                                onChange={(e) => setOwner(index, "occupation", e.target.value)}
+                                                placeholder="e.g., Engineer"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-sm font-medium text-gray-700">Mobile</label>
+                                            <input 
+                                                className="mt-1 w-full rounded-lg border p-3" 
+                                                value={owner.mobile} 
+                                                onChange={(e) => {
+                                                    const value = e.target.value;
+                                                    if (/^\d*$/.test(value)) {
+                                                        setOwner(index, "mobile", value);
+                                                    }
+                                                }}
+                                                placeholder="10-digit number"
+                                                inputMode="numeric"
+                                                pattern="[0-9]*"
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="text-sm font-medium text-gray-700">Email</label>
+                                            <input 
+                                                className="mt-1 w-full rounded-lg border p-3" 
+                                                value={owner.email} 
+                                                onChange={(e) => setOwner(index, "email", e.target.value)}
+                                                placeholder="you@example.com"
+                                                type="email"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    {/* Photo and Signature Section */}
+                                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                        {/* Photo Upload */}
+                                        <div>
+                                            <label className="text-sm font-medium text-gray-700 mb-2 block">Photo</label>
+                                            <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center">
+                                                <input 
+                                                    type="file" 
+                                                    accept="image/*" 
+                                                    onChange={(e) => {
+                                                        const file = e.target.files && e.target.files[0];
+                                                        if (file) {
+                                                            const reader = new FileReader();
+                                                            reader.onload = (e) => {
+                                                                setOwner(index, "photoUrl", e.target.result);
+                                                            };
+                                                            reader.readAsDataURL(file);
+                                                        }
+                                                    }}
+                                                    className="hidden"
+                                                    id={`photo-${index}`}
+                                                />
+                                                <label 
+                                                    htmlFor={`photo-${index}`}
+                                                    className="cursor-pointer text-blue-600 hover:text-blue-800 font-medium"
+                                                >
+                                                    {owner.photoUrl ? "Change Photo" : "Upload Photo"}
+                                                </label>
+                                                {owner.photoUrl && (
+                                                    <div className="mt-2">
+                                                        <img 
+                                                            src={owner.photoUrl} 
+                                                            alt="Tenant Photo" 
+                                                            className="w-20 h-20 object-cover rounded-lg mx-auto"
+                                                        />
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Signature */}
+                                        <div>
+                                            <label className="text-sm font-medium text-gray-700 mb-2 block">Signature</label>
+                                            <div className="space-y-3">
+                                                <div className="space-y-2 relative">
+                                                    <canvas
+                                                        data-owner-index={index}
+                                                        width={300}
+                                                        height={120}
+                                                        className="w-full h-24 bg-white rounded-lg border cursor-crosshair"
+                                                        style={{ 
+                                                            touchAction: 'none',
+                                                            userSelect: 'none',
+                                                            WebkitUserSelect: 'none'
+                                                        }}
+                                                        onMouseDown={(e) => startOwnerSignature(e, index)}
+                                                        onMouseMove={(e) => moveOwnerSignature(e, index)}
+                                                        onMouseUp={(e) => endOwnerSignature(e, index)}
+                                                        onMouseLeave={(e) => endOwnerSignature(e, index)}
+                                                        onTouchStart={(e) => startOwnerSignature(e, index)}
+                                                        onTouchMove={(e) => moveOwnerSignature(e, index)}
+                                                        onTouchEnd={(e) => endOwnerSignature(e, index)}
+                                                        onTouchCancel={(e) => endOwnerSignature(e, index)}
+                                                    />
+                                                    <button 
+                                                        type="button" 
+                                                        onClick={() => clearOwnerSignature(index)} 
+                                                        className="absolute top-2 right-2 p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-full transition-colors"
+                                                        title="Clear signature"
+                                                    >
+                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1-1H9a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                                                                                            <div className="space-y-2">
+                                                                                                                <input
+                                                    type="file"
+                                                    accept="image/*"
+                                                    data-owner-index={index}
+                                                    onChange={(e) => {
+                                                        const file = e.target.files && e.target.files[0];
+                                                        if (file) {
+                                                            const reader = new FileReader();
+                                                            reader.onload = (e) => {
+                                                                setOwner(index, "signatureDataUrl", e.target.result);
+                                                            };
+                                                            reader.readAsDataURL(file);
+                                                        }
+                                                    }}
+                                                    className="w-full text-sm border rounded-lg p-2"
+                                                />
+                                                    {owner.signatureDataUrl && (
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="text-xs text-green-600">✓ Signature uploaded</span>
+                                                            <button 
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    setOwner(index, "signatureDataUrl", "");
+                                                                    // Reset the file input
+                                                                    const fileInput = document.querySelector(`input[type="file"][data-owner-index="${index}"]`);
+                                                                    if (fileInput) {
+                                                                        fileInput.value = "";
+                                                                    }
+                                                                }}
+                                                                className="text-xs text-red-600 hover:text-red-800"
+                                                            >
+                                                                Remove
+                                                            </button>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Add Tenant Button */}
+                        <div className="mt-6 text-center">
+                            <button 
+                                onClick={addOwnerRow} 
+                                className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                            >
+                                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                                </svg>
+                                Add Member
+                            </button>
+                        </div>
+                    </div>
+
+
+
+                    <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-3">
+                        <div>
+                            <label className="text-sm font-medium">Lease Start Date</label>
+                            <input type="date" value={data.leaseStartDate} onChange={(e) => update("leaseStartDate", e.target.value)} className="mt-1 w-full rounded-xl border p-2" />
+                        </div>
+                        <div>
+                            <label className="text-sm font-medium">Lease End Date</label>
+                            <input type="date" value={data.leaseEndDate} onChange={(e) => update("leaseEndDate", e.target.value)} className="mt-1 w-full rounded-xl border p-2" />
+                        </div>
+                    </div>
+
+                    <div className="mt-6">
+                        <label className="text-sm font-medium">Place</label>
+                        <input value={data.place} onChange={(e) => update("place", e.target.value)} className="mt-1 w-full rounded-xl border p-2" placeholder="e.g., Chennai" />
+                    </div>
+
+                    {/* Main Tenant Signature Upload */}
+                    <div className="mt-6">
+                        <label className="text-sm font-medium">Main Tenant Signature</label>
+                        <div className="mt-3 space-y-3">
+                            <div className="space-y-2 relative">
+                                <canvas
+                                    ref={canvasRef}
+                                    width={300}
+                                    height={120}
+                                    className="w-full h-24 bg-white rounded-lg border cursor-crosshair"
+                                    style={{ 
+                                        touchAction: 'none',
+                                        userSelect: 'none',
+                                        WebkitUserSelect: 'none'
+                                    }}
+                                    onMouseDown={startDraw}
+                                    onMouseMove={moveDraw}
+                                    onMouseUp={endDraw}
+                                    onMouseLeave={endDraw}
+                                    onTouchStart={startDraw}
+                                    onTouchMove={moveDraw}
+                                    onTouchEnd={endDraw}
+                                    onTouchCancel={endDraw}
+                                />
+                                <button 
+                                    type="button" 
+                                    onClick={clearSignature} 
+                                    className="absolute top-2 right-2 p-1 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-full transition-colors"
+                                    title="Clear signature"
+                                >
+                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1-1H9a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div className="space-y-2">
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    data-main-signature="true"
+                                    onChange={(e) => {
+                                        const file = e.target.files && e.target.files[0];
+                                        if (file) {
+                                            const reader = new FileReader();
+                                            reader.onload = (e) => {
+                                                update("signatureDataUrl", e.target.result);
+                                            };
+                                            reader.readAsDataURL(file);
+                                        }
+                                    }}
+                                    className="w-full text-sm border rounded-lg p-2"
+                                />
+                                {data.signatureDataUrl && (
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-xs text-green-600">✓ Signature uploaded</span>
+                                        <button 
+                                            type="button"
+                                            onClick={() => {
+                                                update("signatureDataUrl", "");
+                                                // Reset the file input
+                                                const fileInput = document.querySelector('input[type="file"][data-main-signature="true"]');
+                                                if (fileInput) {
+                                                    fileInput.value = "";
+                                                }
+                                            }}
+                                            className="text-xs text-red-600 hover:text-red-800"
+                                        >
+                                            Remove
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            {/* Preview/Printable column */}
+            <section>
+                <div id="printable" className="rounded-2xl bg-white p-6 shadow-sm print:shadow-none print:rounded-none">
+                    <PrintableView data={data} /* photoUrl={photoUrl} */ showAssociationSignBox={showAssociationSignBox} />
+                </div>
+            </section>
+        </div>
+
+        {/* Saved Forms Modal */}
+        {showSavedForms && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-2xl p-6 max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+                    <div className="flex items-center justify-between mb-4">
+                        <h3 className="text-lg font-semibold">Saved Forms</h3>
+                        <button 
+                            onClick={() => setShowSavedForms(false)}
+                            className="text-gray-500 hover:text-gray-700 text-2xl"
+                        >
+                            ×
+                        </button>
+                    </div>
+                    
+                    {savedForms.length === 0 ? (
+                        <div className="text-center py-8 text-gray-500">
+                            <div className="text-4xl mb-2">📁</div>
+                            <p>No saved forms yet.</p>
+                            <p className="text-sm">Save your current form to see it here.</p>
+                        </div>
+                    ) : (
+                        <div className="space-y-3">
+                            {savedForms.map((form) => (
+                                <div key={form.id} className="border rounded-lg p-4 hover:bg-gray-50">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex-1">
+                                            <h4 className="text-lg font-semibold">{form.name}</h4>
+                                            <div className="text-sm text-gray-500 mt-1">
+                                                <span>Created: {new Date(form.createdAt).toLocaleDateString()}</span>
+                                                <span className="mx-2">•</span>
+                                                <span>Modified: {new Date(form.lastModified).toLocaleDateString()}</span>
+                                            </div>
+                                            <div className="text-xs text-gray-400 mt-1">
+                                                {form.data.owners[0]?.name ? `Primary: ${form.data.owners[0].title} ${form.data.owners[0].name}` : 'No primary member'}
+                                                {form.data.block && form.data.flatNo && ` • ${form.data.block}${form.data.flatNo}`}
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-2 ml-4">
+                                            <button 
+                                                onClick={() => loadForm(form.id)}
+                                                className="px-3 py-1 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
+                                            >
+                                                Load
+                                            </button>
+                                            <button 
+                                                onClick={() => deleteForm(form.id)}
+                                                className="px-3 py-1 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors"
+                                            >
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                    
+                    <div className="mt-6 text-center">
+                        <button 
+                            onClick={() => setShowSavedForms(false)}
+                            className="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )}
+
+        {/* FAQ Modal */}
+        <div className="fixed bottom-4 right-4 z-40 print:hidden">
+            <button 
+                onClick={() => setShowFAQ(!showFAQ)} 
+                className="bg-blue-600 text-white px-4 py-3 rounded-full shadow-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
+                title="Frequently Asked Questions"
+            >
+                <span className="font-medium text-sm">FAQ</span>
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </button>
+        </div>
+
+        {showFAQ && (
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div className="bg-white rounded-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className="text-2xl font-bold text-gray-800">Frequently Asked Questions - Tenant Form</h3>
+                        <button 
+                            onClick={() => setShowFAQ(false)}
+                            className="text-gray-500 hover:text-gray-700 text-3xl"
+                        >
+                            ×
+                        </button>
+                    </div>
+                    
+                    <div className="space-y-6">
+                        {/* FAQ 1 */}
+                        <div className="border-l-4 border-green-500 pl-4">
+                            <h4 className="text-lg font-semibold text-gray-800 mb-2">
+                                Why do I need to enroll in MyGate (TAAOWA Society)?
+                            </h4>
+                            <div className="text-gray-700">
+                                <p>Enrollment ensures you are formally registered under the new association-managed system. It helps streamline communication, facility access, and future digital services.</p>
+                            </div>
+                        </div>
+
+                        {/* FAQ 2 */}
+                        <div className="border-l-4 border-blue-500 pl-4">
+                            <h4 className="text-lg font-semibold text-gray-800 mb-2">
+                                Are tenants also required to register?
+                            </h4>
+                            <div className="text-gray-700">
+                                <p><strong>Yes.</strong> All tenants must fill out the Tenant Registration Form so that the association has complete records of occupancy. This ensures safety, accountability, and proper communication.</p>
+                            </div>
+                        </div>
+
+                        {/* FAQ 3 */}
+                        <div className="border-l-4 border-purple-500 pl-4">
+                            <h4 className="text-lg font-semibold text-gray-800 mb-2">
+                                Who needs to register vehicles in MyGate?
+                            </h4>
+                            <div className="text-gray-700">
+                                <p>All Car & Two-Wheeler owners (both Residents & Tenants) must register their vehicle details in MyGate. Stickers will be issued after successful registration to allow smooth parking management.</p>
+                            </div>
+                        </div>
+
+                        {/* FAQ 4 */}
+                        <div className="border-l-4 border-yellow-500 pl-4">
+                            <h4 className="text-lg font-semibold text-gray-800 mb-2">
+                                Can tenants also get parking stickers?
+                            </h4>
+                            <div className="text-gray-700">
+                                <p><strong>Yes.</strong> Tenants with valid vehicle details registered in MyGate will be issued stickers, just like owners.</p>
+                            </div>
+                        </div>
+
+                        {/* FAQ 5 */}
+                        <div className="border-l-4 border-red-500 pl-4">
+                            <h4 className="text-lg font-semibold text-gray-800 mb-2">
+                                How will dual car parking / additional vehicles be managed?
+                            </h4>
+                            <div className="text-gray-700">
+                                <p>Currently, MyGate allows only one vehicle per flat to be added by residents. For flats with dual car parking or additional vehicles, residents should submit details to the SPOCs. After validation, admins will add the extra vehicle(s) in MyGate and issue stickers accordingly.</p>
+                            </div>
+                        </div>
+
+                        {/* FAQ 6 */}
+                        <div className="border-l-4 border-indigo-500 pl-4">
+                            <h4 className="text-lg font-semibold text-gray-800 mb-2">
+                                Who should I reach out to for help?
+                            </h4>
+                            <div className="text-gray-700">
+                                <p>Each tower has designated Points of Contact (SPOCs):</p>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+                                    <div className="bg-blue-50 p-3 rounded-lg">
+                                        <h5 className="font-semibold text-blue-800">Tower A</h5>
+                                        <p className="text-sm">Himanshu & Raghu</p>
+                                    </div>
+                                    <div className="bg-green-50 p-3 rounded-lg">
+                                        <h5 className="font-semibold text-green-800">Tower B</h5>
+                                        <p className="text-sm">Srivatsava & Sujatha</p>
+                                    </div>
+                                    <div className="bg-purple-50 p-3 rounded-lg">
+                                        <h5 className="font-semibold text-purple-800">Tower C</h5>
+                                        <p className="text-sm">Logeswari & Manoj</p>
+                                    </div>
+                                    <div className="bg-yellow-50 p-3 rounded-lg">
+                                        <h5 className="font-semibold text-yellow-800">Tower D</h5>
+                                        <p className="text-sm">Elavarsan & Sushurutha</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* FAQ 7 - Important Documents */}
+                        <div className="border-l-4 border-red-500 pl-4">
+                            <h4 className="text-lg font-semibold text-gray-800 mb-2">
+                                📋 Important Association Documents
+                            </h4>
+                            <div className="text-gray-700 space-y-3">
+                                <p>Access official TAAOWA documents for complete information:</p>
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="bg-red-50 p-4 rounded-lg border border-red-200">
+                                        <h5 className="font-semibold text-red-800 mb-2">🏛️ Association Registration Certificate</h5>
+                                        <p className="text-sm text-gray-600 mb-3">Official registration certificate from the government authorities</p>
+                                        <a 
+                                            href="../assets/documents/ACE- Association Registration Certificate.pdf" 
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white text-sm rounded-lg hover:bg-red-700 transition-colors"
+                                        >
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                            View Certificate
+                                        </a>
+                                    </div>
+                                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
+                                        <h5 className="font-semibold text-blue-800 mb-2">📜 Bye-Laws & Members Signed</h5>
+                                        <p className="text-sm text-gray-600 mb-3">Complete bye-laws document with member signatures</p>
+                                        <a 
+                                            href="../assets/documents/Bye laws & Members signed.pdf" 
+                                            target="_blank" 
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
+                                        >
+                                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                            </svg>
+                                            View Bye-Laws
+                                        </a>
+                                    </div>
+                                </div>
+                                <div className="bg-gray-50 p-3 rounded-lg">
+                                    <p className="text-sm text-gray-600">
+                                        <strong>Note:</strong> These documents contain the official rules and regulations that govern TAAOWA. 
+                                        Tenants should review these documents to understand the association's policies and their responsibilities.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div className="mt-6 text-center">
+                        <button 
+                            onClick={() => setShowFAQ(false)}
+                            className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                        >
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        )}
+
+        <style>{`
+            @page { 
+                size: A4; 
+                margin: 16mm;
+                @top-center { content: ""; }
+                @top-left { content: ""; }
+                @top-right { content: ""; }
+                @bottom-center { content: ""; }
+                @bottom-left { content: ""; }
+                @bottom-right { content: ""; }
+            }
+            @media print {
+                body { background: white; }
+                .print\\:hidden { display: none !important; }
+                #printable { box-shadow: none !important; }
+                @page { 
+                    margin-top: 0;
+                    margin-bottom: 0;
+                }
+            }
+        `}</style>
+    </div>
+);
+  }
+
+  function FieldRow({ label, children }) {
+return (
+    <div className="grid grid-cols-12 gap-2 items-start">
+        <div className="col-span-4 md:col-span-3 text-sm font-medium text-neutral-700">{label}</div>
+        <div className="col-span-8 md:col-span-9">{children}</div>
+    </div>
+);
+  }
+
+  function LineBox({ children }) {
+return <div className="min-h-8 border-b border-dashed pb-1">{children}</div>;
+  }
+
+  const PrintableView = React.memo(function PrintableView({ data, showAssociationSignBox }) {
+const today = React.useMemo(() => new Date().toLocaleDateString(), []);
+
+return (
+    <div className="space-y-5">
+        {/* Association Header */}
+        <div className="text-center border-b pb-4">
+            <div className="flex items-center justify-center gap-4 mb-3">
+                <img src="../assets/images/taaowa-logo.jpeg" alt="THE ACE Logo" className="h-16 w-16 object-contain" />
+            </div>
+            <h1 className="text-2xl font-bold text-gray-800">THE ACE APARTMENT OWNERS WELFARE ASSOCIATION</h1>
+            <p className="text-sm text-gray-600 mt-1">(Reg. No.Chennai South/175/2025. Under TN Apartment Ownership Act 2022)</p>
+        </div>
+
+        {/* Address / To */}
+        <div>
+            <div>To,</div>
+            <div className="font-medium">The President / Secretary</div>
+            <div className="text-sm">{data.buildingName} Apartment Owners Welfare Association</div>
+            <div className="text-sm">{data.addressLine}</div>
+        </div>
+
+        {/* Salutation paragraph */}
+        <div className="text-sm leading-6">
+            I, <b>{data.owners[0]?.title || "Mr"} {data.owners[0]?.name || "__________"}</b> hereby submit an application for tenancy of the <b>{data.buildingName}</b> Apartment.
+        </div>
+
+        {/* Member table */}
+        <div>
+            <div className="font-semibold">Tenant details</div>
+            <table className="mt-2 w-full text-sm">
+                <thead>
+                    <tr className="border-b">
+                        <th className="text-center py-1 pr-2">Sr. No.</th>
+                        <th className="text-center py-1 pr-2">Name</th>
+                        <th className="text-center py-1 pr-2">Age</th>
+                        <th className="text-center py-1 pr-2">Occupation</th>
+                        <th className="text-center py-1 pr-2">Mobile</th>
+                        <th className="text-center py-1 pr-2">Email</th>
+                        <th className="text-center py-1 pr-2">Flat No.</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {(() => {
+                        const rows = [];
+                        for (let i = 0; i < 3; i++) {
+                            const owner = data.owners[i] || { name: "", title: "", age: "", occupation: "", mobile: "", email: "", details: "", location: "", memberInJoint: "Yes" };
+                            rows.push(
+                                <tr key={i} className="border-b last:border-b-0 align-top">
+                                    <td className="py-1 pr-2">{i + 1}</td>
+                                    <td className="py-1 pr-2">{owner.name && owner.name.trim() ? `${owner.title || ""} ${owner.name}`.trim() : ""}</td>
+                                    <td className="py-1 pr-2">{owner.age || ""}</td>
+                                    <td className="py-1 pr-2">{owner.occupation || ""}</td>
+                                    <td className="py-1 pr-2">{owner.mobile || ""}</td>
+                                    <td className="py-1 pr-2">{owner.email || ""}</td>
+                                    <td className="py-1 pr-2">{owner.name && owner.name.trim() ? `${data.block && ` ${data.block}`} ${data.flatNo}` : ""}</td>
+                                </tr>
+                            );
+                        }
+                        return rows;
+                    })()}
+                </tbody>
+            </table>
+        </div>
+
+        {/* Lease Period */}
+        <div className="space-y-3">
+            <FieldRow label="Lease Period">
+                <LineBox>{data.leaseStartDate || "_____"} to {data.leaseEndDate || "_____"}</LineBox>
+            </FieldRow>
+        </div>
+
+        {/* Declarations */}
+        <div className="space-y-2 text-sm leading-6">
+            <p>
+                I undertake to use the flat for residential purposes only and will not sublet or change the use without prior written permission from the Association.
+            </p>
+            <p>
+                I/We, <b>{data.owners.filter(owner => owner.name && owner.name.trim()).map((owner, index) =>
+                    `${owner.title || "Mr"} ${owner.name}${index < data.owners.filter(o => o.name && o.name.trim()).length - 1 ? ', ' : ''}`
+                ).join('')} </b>residing at <b>{data.block && data.flatNo ? `${data.block} ${data.flatNo}` : '_____'}</b> as tenant(s), hereby agree to abide by the rules and regulations of the Association, as currently in force and as may be amended from time to time.
+                <br/>
+                I/We confirm that we have read and understood these rules and regulations, and accept that the Association is empowered to take appropriate action against me/us in the event of any violation.
+                <br/>
+                Furthermore, I/We undertake to pay all maintenance charges on time. In case of default, I/We acknowledge and accept that the Association reserves the right to initiate necessary action for recovery.
+            </p>
+            <p>
+                I understand that this tenancy is subject to the approval of the Association and all applicable laws.
+            </p>
+        </div>
+
+        {/* Place */}
+        <div className="grid grid-cols-12 gap-4 mt-2">
+            <div className="col-span-6">
+                <FieldRow label="Place">
+                    <LineBox>{data.place}</LineBox>
+                </FieldRow>
+            </div>
+        </div>
+
+        {/* Date */}
+        <div className="grid grid-cols-12 gap-4 mt-2">
+            <div className="col-span-6">
+                <FieldRow label="Date">
+                    <LineBox>{data.date || today} {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true })}</LineBox>
+                </FieldRow>
+            </div>
+        </div>
+
+        {/* Photos and Signatures */}
+        <br/>
+        <br/>
+        <div className="mt-12">
+            <div className="font-semibold mb-4">Photos and Signatures</div>
+            
+            {/* All Photos and Signatures in One Row */}
+            <div className="flex flex-wrap gap-8 mb-6">
+                {/* Member Photo and Signature */}
+                <div className="text-left" data-testid="signature-tenant">
+                    <div className="flex items-center gap-4">
+                        {/* Member Photo */}
+                        <div className="aspect-[3/4] w-32 border flex items-center justify-center text-xs text-neutral-500">
+                            {data.owners[0]?.photoUrl ? <img src={data.owners[0].photoUrl} alt="Member" className="h-full w-full object-cover" /> : "Photo"}
+                        </div>
+                        {/* Member Signature */}
+                        <div className="h-20 w-48 flex items-center justify-center border-b border-neutral-800">
+                            {data.owners[0]?.signatureDataUrl ? (
+                                <img 
+                                    src={data.owners[0].signatureDataUrl} 
+                                    alt="Signature" 
+                                    className="max-h-16 max-w-full object-contain" 
+                                    style={{ width: 'auto', height: 'auto' }}
+                                />
+                            ) : data.owners[0]?.canvasSignatureUrl ? (
+                                <img 
+                                    src={data.owners[0].canvasSignatureUrl} 
+                                    alt="Canvas Signature" 
+                                    className="max-h-16 max-w-full object-contain" 
+                                    style={{ width: 'auto', height: 'auto' }}
+                                />
+                            ) : null}
+                        </div>
+                    </div>
+                    <div className="text-sm mt-1">(Signature of the Member)</div>
+                    {data.owners[0]?.name && (
+                        <div className="text-sm mt-1 font-medium">{data.owners[0]?.title || "Mr"} {data.owners[0].name}</div>
+                    )}
+                </div>
+
+                {/* Main Tenant Signature (if different from member) */}
+                {data.signatureDataUrl || data.canvasSignatureUrl ? (
+                    <div className="text-left">
+                        <div className="flex items-center gap-4">
+                            {/* Main Tenant Signature */}
+                            <div className="h-20 w-48 flex items-center justify-center border-b border-neutral-800">
+                                {data.signatureDataUrl ? (
+                                    <img 
+                                        src={data.signatureDataUrl} 
+                                        alt="Main Tenant Signature" 
+                                        className="max-h-16 max-w-full object-contain" 
+                                        style={{ width: 'auto', height: 'auto' }}
+                                    />
+                                ) : data.canvasSignatureUrl ? (
+                                    <img 
+                                        src={data.canvasSignatureUrl} 
+                                        alt="Main Tenant Canvas Signature" 
+                                        className="max-h-16 max-w-full object-contain" 
+                                        style={{ width: 'auto', height: 'auto' }}
+                                    />
+                                ) : null}
+                            </div>
+                        </div>
+                        <div className="text-sm mt-1">(Main Tenant Signature)</div>
+                    </div>
+                ) : null}
+
+                {/* Joint Member Photos and Signatures */}
+                {data.owners
+                    .slice(1) // Skip the first owner (primary member) since they're handled separately
+                    .filter(owner => owner.name && owner.name.trim())
+                    .map((owner, index) => (
+                        <div key={index} className="text-left">
+                            <div className="flex items-center gap-4">
+                                {/* Joint Member Photo */}
+                                <div className="aspect-[3/4] w-32 border flex items-center justify-center text-xs text-neutral-500">
+                                    {owner.photoUrl ? <img src={owner.photoUrl} alt={`${owner.title} ${owner.name}`} className="h-full w-full object-cover" /> : "Photo"}
+                                </div>
+                                {/* Joint Member Signature */}
+                                <div className="h-20 w-48 flex items-center justify-center border-b border-neutral-800">
+                                    {owner.signatureDataUrl ? (
+                                        <img 
+                                            src={owner.signatureDataUrl} 
+                                            alt="Owner Signature" 
+                                            className="max-h-16 max-w-full object-contain" 
+                                            style={{ width: 'auto', height: 'auto' }}
+                                        />
+                                    ) : owner.canvasSignatureUrl ? (
+                                        <img 
+                                            src={owner.canvasSignatureUrl} 
+                                            alt="Canvas Signature" 
+                                            className="max-h-16 max-w-full object-contain" 
+                                            style={{ width: 'auto', height: 'auto' }}
+                                        />
+                                    ) : null}
+                                </div>
+                            </div>
+                            <div className="text-sm mt-1">(Signature of Joint Member {index + 1})</div>
+                            <div className="text-sm mt-1 font-medium">{owner.title} {owner.name}</div>
+                        </div>
+                    ))}
+
+                {/* Association Signature */}
+                {showAssociationSignBox && (
+                    <div className="text-left" data-testid="signature-association">
+                        <div className="h-20 w-48 border-b border-neutral-800"></div>
+                        <div className="text-sm mt-1">(Signature with Seal – Association Official)</div>
+                    </div>
+                )}
+            </div>
+        </div>
+
+        <div className="text-sm text-neutral-600 mt-6">(For Office use) Application No. ____________ • Receipt No. ____________</div>
+
+    </div>
+);
+  });
+
+  // Render the app
+  const root = ReactDOM.createRoot(document.getElementById('root'));
+  root.render(<App />);

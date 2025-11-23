@@ -50,13 +50,12 @@ function doPost(e) {
     }
     
     const action = requestData.action;
-    const billNumber = requestData.billNumber;
     
-    if (!action || !billNumber) {
+    if (!action) {
       return ContentService
         .createTextOutput(JSON.stringify({ 
           status: 'error',
-          data: { success: false, error: 'Missing action or billNumber' }
+          data: { success: false, error: 'Missing action' }
         }))
         .setMimeType(ContentService.MimeType.JSON);
     }
@@ -71,8 +70,42 @@ function doPost(e) {
         .setMimeType(ContentService.MimeType.JSON);
     }
     
+    // Handle searchProperties action - searches for properties by block and door number
+    if (action === 'searchProperties') {
+      const block = requestData.block;
+      const doorNumber = requestData.doorNumber;
+      
+      if (!block || !doorNumber) {
+        return ContentService
+          .createTextOutput(JSON.stringify({ 
+            status: 'error',
+            data: { success: false, error: 'Missing block or doorNumber' }
+          }))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+      
+      const properties = searchPropertiesByBlockAndDoor(block, doorNumber);
+      return ContentService
+        .createTextOutput(JSON.stringify({ 
+          status: 'success',
+          data: properties
+        }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    
     // Handle checkStatus action via POST (to avoid CORS issues with GET)
     if (action === 'checkStatus') {
+      const billNumber = requestData.billNumber;
+      
+      if (!billNumber) {
+        return ContentService
+          .createTextOutput(JSON.stringify({ 
+            status: 'error',
+            data: { success: false, error: 'Missing billNumber' }
+          }))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+      
       const status = getPaymentStatus(billNumber);
       return ContentService
         .createTextOutput(JSON.stringify({ 
@@ -88,6 +121,17 @@ function doPost(e) {
     
     // Handle markPaid action
     if (action === 'markPaid') {
+      const billNumber = requestData.billNumber;
+      
+      if (!billNumber) {
+        return ContentService
+          .createTextOutput(JSON.stringify({ 
+            status: 'error',
+            data: { success: false, error: 'Missing billNumber' }
+          }))
+          .setMimeType(ContentService.MimeType.JSON);
+      }
+      
       // Update the sheet
       const result = updatePaymentStatus(billNumber);
       
@@ -125,12 +169,24 @@ function doPost(e) {
 }
 
 /**
- * Handle GET requests (for checking payment status)
+ * Handle GET requests (for checking payment status and searching properties)
  */
 function doGet(e) {
   try {
     const action = e.parameter.action;
     const billNumber = e.parameter.billNumber;
+    const block = e.parameter.block;
+    const doorNumber = e.parameter.doorNumber;
+    
+    if (action === 'searchProperties' && block && doorNumber) {
+      const properties = searchPropertiesByBlockAndDoor(block, doorNumber);
+      return ContentService
+        .createTextOutput(JSON.stringify({ 
+          status: 'success',
+          data: properties
+        }))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
     
     if (action === 'checkStatus' && billNumber) {
       const status = getPaymentStatus(billNumber);
@@ -151,7 +207,7 @@ function doGet(e) {
     }
     
     return ContentService
-      .createTextOutput('Property Tax Payment Status API is running. Use POST method to update payment status or GET with action=checkStatus&billNumber=XXX to check status.')
+      .createTextOutput('Property Tax Payment Status API is running. Use POST method to update payment status or search properties, GET with action=checkStatus&billNumber=XXX to check status.')
       .setMimeType(ContentService.MimeType.TEXT);
   } catch (error) {
     return ContentService
@@ -280,6 +336,126 @@ function testUpdatePaymentStatus() {
 }
 
 /**
+ * Search for properties by block and door number
+ * Returns an array of matching property objects
+ */
+function searchPropertiesByBlockAndDoor(block, doorNumber) {
+  try {
+    // Check if SHEET_ID is configured
+    if (SHEET_ID === 'YOUR_SHEET_ID') {
+      Logger.log('SHEET_ID not configured');
+      return [];
+    }
+    
+    // Open the spreadsheet
+    const spreadsheet = SpreadsheetApp.openById(SHEET_ID);
+    if (!spreadsheet) {
+      Logger.log('Spreadsheet not found with ID: ' + SHEET_ID);
+      return [];
+    }
+    
+    const sheet = spreadsheet.getSheetByName(SHEET_NAME);
+    if (!sheet) {
+      Logger.log('Sheet not found: ' + SHEET_NAME);
+      return [];
+    }
+    
+    // Get all data
+    const dataRange = sheet.getDataRange();
+    const values = dataRange.getValues();
+    
+    if (values.length < 2) {
+      Logger.log('No data rows found (only header or empty sheet)');
+      return [];
+    }
+    
+    const blockUpper = block.toUpperCase();
+    const doorNumberUpper = doorNumber.toUpperCase();
+    const matches = [];
+    const seenBillNumbers = new Set(); // To avoid duplicates
+    
+    // Search through data rows (skip header row)
+    for (let i = 1; i < values.length; i++) {
+      const row = values[i];
+      if (row.length === 0 || !row[0]) continue; // Skip empty rows
+      
+      const propertyAddress = (row[3] || '').toUpperCase(); // Column D (index 3)
+      const billNumber = row[1] || ''; // Column B (index 1)
+      
+      // Skip if we've already added this property (by bill number)
+      if (seenBillNumbers.has(billNumber)) {
+        continue;
+      }
+      
+      let isMatch = false;
+      
+      // Primary pattern: Look for "BLOCK-DOORNUMBER" or "TOWER-DOORNUMBER" format
+      // Examples: "A-102", "D-806", "C-1307"
+      const primaryPattern = blockUpper + '-' + doorNumberUpper;
+      if (propertyAddress.indexOf(primaryPattern) !== -1) {
+        isMatch = true;
+      } else {
+        // Secondary: Check if address contains the block and door number separately
+        // Check if address contains the block
+        // Patterns: BLOCK-A, BLOCK A, BLOCK-1, BLOCK 1, TOWER-A, TOWER A, etc.
+        const blockPatterns = [
+          'BLOCK-' + blockUpper,
+          'BLOCK ' + blockUpper,
+          'BLOCK-' + blockUpper + '-',
+          'BLOCK ' + blockUpper + ' ',
+          'TOWER-' + blockUpper,
+          'TOWER ' + blockUpper,
+          'TOWER- ' + blockUpper,
+          'TOWER ' + blockUpper + ' ',
+          '-' + blockUpper + '-',
+          ' ' + blockUpper + '-',
+          ' ' + blockUpper + ' '
+        ];
+        
+        let hasBlock = false;
+        for (let j = 0; j < blockPatterns.length; j++) {
+          if (propertyAddress.indexOf(blockPatterns[j]) !== -1) {
+            hasBlock = true;
+            break;
+          }
+        }
+        
+        // Check if address contains the door number
+        // Use regex to ensure it's not part of a larger number (e.g., "1021" when searching for "102")
+        const doorNumberRegex = new RegExp('(^|[^0-9])' + doorNumberUpper + '([^0-9]|$)', 'i');
+        const hasDoorNumber = doorNumberRegex.test(propertyAddress);
+        
+        isMatch = hasBlock && hasDoorNumber;
+      }
+      
+      if (isMatch) {
+        // Create property object
+        // Column mapping: A=0, B=1, C=2, D=3, E=4, F=5, G=6, H=7, I=8, J=9, K=10
+        matches.push({
+          sNo: row[0] || '',
+          billNumber: billNumber,
+          ownerName: row[2] || '',
+          propertyAddress: row[3] || '',
+          mobileNo: row[4] || '',
+          propertyType: row[5] || '',
+          propertyUsage: row[6] || '',
+          currentTax: row[7] || '',
+          arrearTaxDue: row[8] || '',
+          balanceAmount: row[9] || ''
+        });
+        seenBillNumbers.add(billNumber);
+      }
+    }
+    
+    Logger.log('Found ' + matches.length + ' matching properties for Block: ' + block + ', Door: ' + doorNumber);
+    return matches;
+  } catch (error) {
+    Logger.log('Error searching properties: ' + error.toString());
+    return [];
+  }
+}
+
+/**
  * Test function - can be run manually to test checking payment status
  * Replace with a test bill number from your sheet
  */
@@ -287,4 +463,17 @@ function testGetPaymentStatus() {
   const testBillNumber = '14-184-29804-000';
   const status = getPaymentStatus(testBillNumber);
   Logger.log('Payment Status for ' + testBillNumber + ': ' + status);
+}
+
+/**
+ * Test function - can be run manually to test searching properties
+ */
+function testSearchProperties() {
+  const testBlock = 'A';
+  const testDoorNumber = '102';
+  const properties = searchPropertiesByBlockAndDoor(testBlock, testDoorNumber);
+  Logger.log('Found ' + properties.length + ' properties for Block: ' + testBlock + ', Door: ' + testDoorNumber);
+  if (properties.length > 0) {
+    Logger.log('First property: ' + JSON.stringify(properties[0]));
+  }
 }

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Maintenance Calculator - The ACE</title>
+    <meta property="og:title" content="Maintenance Calculator - The ACE" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta charset="utf-8" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: 'Poppins', sans-serif;
+        background-color: #f5f5f5;
+        color: #333;
+        line-height: 1.6;
+      }
+      
+      .header {
+        background-color: #ffffff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 15px 0;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      
+      .header-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+      }
+      
+      .header-logo {
+        height: 50px;
+        width: auto;
+      }
+      
+      .header-title {
+        font-size: 20px;
+        font-weight: 600;
+        color: #000080;
+      }
+      
+      .back-button {
+        padding: 10px 20px;
+        background-color: #000080;
+        color: white;
+        text-decoration: none;
+        border-radius: 4px;
+        font-size: 14px;
+        font-weight: 500;
+        transition: background-color 0.3s ease;
+      }
+      
+      .back-button:hover {
+        background-color: #000060;
+      }
+      
+      .main-container {
+        max-width: 1000px;
+        margin: 30px auto;
+        padding: 0 20px;
+      }
+      
+      .page-title {
+        text-align: center;
+        color: #000080;
+        font-size: 32px;
+        font-weight: 700;
+        margin-bottom: 10px;
+      }
+      
+      .page-subtitle {
+        text-align: center;
+        color: #666;
+        font-size: 16px;
+        margin-bottom: 30px;
+      }
+      
+      .calculator-container {
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        margin-bottom: 20px;
+      }
+      
+      .calculator-header {
+        background-color: #000080;
+        color: white;
+        padding: 20px;
+        text-align: center;
+        border-radius: 8px 8px 0 0;
+        margin: -30px -30px 30px -30px;
+      }
+      
+      .calculator-header h2 {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 5px;
+      }
+      
+      .form-group {
+        margin-bottom: 20px;
+      }
+      
+      .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+        color: #333;
+        font-size: 14px;
+      }
+      
+      .form-group input,
+      .form-group select {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #ddd;
+        border-radius: 4px;
+        font-size: 16px;
+        font-family: 'Poppins', sans-serif;
+        transition: border-color 0.3s ease;
+      }
+      
+      .form-group input:focus,
+      .form-group select:focus {
+        outline: none;
+        border-color: #000080;
+      }
+      
+      .form-group input[readonly] {
+        background-color: #f5f5f5;
+        cursor: not-allowed;
+        color: #666;
+      }
+      
+      .form-group input[readonly]:focus {
+        border-color: #ddd;
+      }
+      
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+      }
+      
+      .results-container {
+        background-color: #e8f4f8;
+        border-left: 4px solid #000080;
+        padding: 20px;
+        margin-top: 30px;
+        border-radius: 4px;
+      }
+      
+      .results-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #000080;
+        margin-bottom: 15px;
+      }
+      
+      .result-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px 0;
+        border-bottom: 1px solid #ccc;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      
+      .result-item:last-child {
+        border-bottom: none;
+        font-weight: 700;
+        font-size: 18px;
+        color: #000080;
+        padding-top: 15px;
+        margin-top: 10px;
+        border-top: 2px solid #000080;
+      }
+      
+      .result-label {
+        color: #666;
+        flex: 1;
+        min-width: 0;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+      }
+      
+      .result-value {
+        font-weight: 600;
+        color: #000080;
+        flex-shrink: 0;
+        text-align: right;
+      }
+      
+      .calculate-button {
+        width: 100%;
+        padding: 15px;
+        background-color: #000080;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        font-weight: 600;
+        font-family: 'Poppins', sans-serif;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin-top: 10px;
+      }
+      
+      .calculate-button:hover {
+        background-color: #000060;
+      }
+      
+      .calculate-button:active {
+        transform: scale(0.98);
+      }
+      
+      .info-box {
+        background-color: #e8f4f8;
+        border-left: 4px solid #000080;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 4px;
+      }
+      
+      .info-box p {
+        margin: 5px 0;
+        color: #333;
+        font-size: 14px;
+      }
+      
+      .flat-display {
+        font-size: 18px;
+        font-weight: 600;
+        color: #000080;
+        text-align: center;
+        padding: 10px;
+        background-color: #f0f0f0;
+        border-radius: 4px;
+        margin-bottom: 20px;
+      }
+      
+      @media (max-width: 768px) {
+        .page-title {
+          font-size: 24px;
+        }
+        
+        .header-content {
+          flex-direction: column;
+          gap: 15px;
+        }
+        
+        .header-title {
+          font-size: 18px;
+        }
+        
+        .header-logo {
+          height: 40px;
+        }
+        
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+        
+        .main-container {
+          margin: 15px auto;
+          padding: 0 15px;
+        }
+        
+        .calculator-container {
+          padding: 15px;
+        }
+        
+        .calculator-header {
+          margin: -15px -15px 15px -15px;
+          padding: 15px;
+        }
+        
+        .calculator-header h2 {
+          font-size: 20px;
+        }
+        
+        .result-item {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        
+        .result-label {
+          font-size: 13px;
+          margin-bottom: 4px;
+        }
+        
+        .result-value {
+          text-align: left;
+          font-size: 15px;
+        }
+        
+        .result-item:last-child {
+          font-size: 16px;
+        }
+        
+        .info-box {
+          padding: 15px;
+          font-size: 13px;
+        }
+        
+        .info-box p {
+          font-size: 13px;
+        }
+        
+        .page-subtitle {
+          font-size: 14px;
+        }
+        
+        .calculate-button {
+          padding: 14px;
+          font-size: 15px;
+        }
+        
+        .form-group input,
+        .form-group select {
+          font-size: 16px; /* Prevents zoom on iOS */
+          padding: 14px;
+        }
+      }
+      
+      @media (max-width: 480px) {
+        .page-title {
+          font-size: 20px;
+        }
+        
+        .calculator-header h2 {
+          font-size: 18px;
+        }
+        
+        .result-label {
+          font-size: 12px;
+        }
+        
+        .result-value {
+          font-size: 14px;
+        }
+        
+        .info-box {
+          padding: 12px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <div class="header-content">
+        <div class="logo-container">
+          <img src="../assets/images/ace_risland_logo.png" alt="ACE by Risland Logo" class="header-logo">
+          <div class="header-title">The ACE</div>
+        </div>
+        <a href="../index.html" class="back-button">← Back to Home</a>
+      </div>
+    </div>
+    
+    <div class="main-container">
+      <h1 class="page-title">Maintenance Calculator</h1>
+      <p class="page-subtitle">Calculate your maintenance charges based on your block, door number, and handover date</p>
+      
+      <div class="info-box">
+        <p><strong>Instructions:</strong></p>
+        <p>Enter your block and door number in the calculator below. The rest of the fields will automatically calculate based on your handover date and square footage.</p>
+      </div>
+      
+      <div class="calculator-container">
+        <div class="calculator-header">
+          <h2>Maintenance Calculator</h2>
+          <p>Calculate your maintenance charges</p>
+        </div>
+        
+        <form id="calculatorForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="block">Block *</label>
+              <input type="text" id="block" name="block" required>
+            </div>
+            
+            <div class="form-group">
+              <label for="doorNumber">Door Number *</label>
+              <input type="text" id="doorNumber" name="doorNumber" required>
+            </div>
+          </div>
+          
+          <div id="flatDisplay" class="flat-display" style="display: none;"></div>
+          
+          <button type="submit" class="calculate-button">Calculate Maintenance</button>
+        </form>
+        
+        <div id="results" class="results-container" style="display: none;">
+          <div class="results-title">Calculation Results</div>
+          <div class="result-item">
+            <span class="result-label">Handover Date (DD-MM-YYYY):</span>
+            <span class="result-value" id="handoverDateResult">-</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Square Feet (Sq Ft):</span>
+            <span class="result-value" id="sqftResult">-</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Total Number of days:</span>
+            <span class="result-value" id="daysResult">-</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Months:</span>
+            <span class="result-value" id="monthsResult">-</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Days (remaining):</span>
+            <span class="result-value" id="remainingDaysResult">-</span>
+          </div>
+          <div class="result-item">
+            <!-- This label is dynamically updated by JavaScript to show actual day count -->
+            <span class="result-label" id="maintenanceDaysLabel">Maintenance for Days (Rs. 4 × SqFt × Days × 12/365):</span>
+            <span class="result-value" id="maintenanceDaysResult">-</span>
+          </div>
+          <div class="result-item">
+            <!-- This label is dynamically updated by JavaScript to show actual month count -->
+            <span class="result-label" id="maintenanceMonthsLabel">Maintenance for Months (Rs. 4 × SqFt × Months):</span>
+            <span class="result-value" id="maintenanceMonthsResult">-</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">Total Maintenance Amount (Rs.):</span>
+            <span class="result-value" id="totalResult">-</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="info-box" style="margin-top: 30px;">
+        <p><strong>FAQ:</strong></p>
+        <p style="margin-top: 10px;"><strong>1. Why this period?</strong> We all have handover at different points of time. This is the first invoice. Hence, this is raised for a singular period from the completion of your handover till Mar'2026.</p>
+        <p style="margin-top: 10px;"><strong>2. Why only Rs. 4?</strong> This is only for maintenance. Water will be on actuals and shall be shared separately.</p>
+        <p style="margin-top: 10px;"><strong>3. Why is it collected in advance?</strong> As discussed in GBM, our current expense is budgeted at Rs. 30 lakhs per month (excl. water). Builder has handed over Rs. 1.03 cr during transition in Sep 25. To ensure that we have continued operations in Ace, this amount is collected.</p>
+        <p style="margin-top: 10px;"><strong>4. Due date:</strong> The due date has been changed from 30th Nov to 15th Dec 2025.</p>
+        <p style="margin-top: 10px;"><strong>5. What will be my frequency of billing?</strong> From Apr 2026, we will review our cash position and we will have Monthly/Quarterly/HalfYearly/Annual. Subject to approval of a general body meeting, this shall be published in Feb 2026.</p>
+        <p style="margin-top: 10px;"><strong>6. What types of payment are supported?</strong> We accept payments through MyGate, SBI Collect and Cheque (please check MyGate notice for details).</p>
+      </div>
+    </div>
+    
+    <script src="../scripts/maintenance-calculator.js"></script>
+  </body>
+</html>
