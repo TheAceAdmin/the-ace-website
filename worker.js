@@ -15,11 +15,6 @@ export default {
       }
     }
 
-    // Default to index.html for root
-    if (pathname === '/') {
-      pathname = '/index.html';
-    }
-
     // Get the file from the site bucket
     try {
       const file = await env.ASSETS.fetch(new URL(pathname, request.url));
