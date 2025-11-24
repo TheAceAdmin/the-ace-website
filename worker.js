@@ -3,6 +3,11 @@ export default {
     const url = new URL(request.url);
     let pathname = url.pathname;
 
+    // Default to index.html for root
+    if (pathname === '/' || pathname === '/index.html' || pathname === '') {
+      pathname = '/index.html';
+    }
+
     // Redirect first-level paths (other than root and existing /pages/*) to /pages/<segment>
     if (pathname !== '/' && !pathname.startsWith('/pages/')) {
       const segment = pathname.split('/')[1];
