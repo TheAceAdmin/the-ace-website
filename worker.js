@@ -8,18 +8,6 @@ export default {
       pathname = '/index.html';
     }
 
-    // Redirect first-level paths (other than root and existing /pages/*) to /pages/<segment>
-    if (pathname !== '/' && !pathname.startsWith('/pages/')) {
-      const segment = pathname.split('/')[1];
-      const hasNestedSegment = pathname.slice(1).includes('/');
-
-      if (segment && !hasNestedSegment) {
-        const redirectUrl = new URL(url);
-        redirectUrl.pathname = `/pages/${segment}`;
-        return Response.redirect(redirectUrl.toString(), 301);
-      }
-    }
-
     // Get the file from the site bucket
     try {
       const file = await env.ASSETS.fetch(new URL(pathname, request.url));
