@@ -8,15 +8,14 @@ The project has been organized into a clear directory structure:
 
 ```
 the-ace-website/
-├── pages/              # All HTML pages
-│   ├── index.html
-│   ├── 404.html
-│   ├── business-opportunities.html
-│   ├── maintenance-calculator.html
-│   ├── membership-form.html
-│   ├── property-tax-lookup.html
-│   ├── stall-terms-and-conditions.html
-│   └── tenant-form.html
+├── 404.html
+├── business-opportunities.html
+├── index.html
+├── maintenance-calculator.html
+├── membership-form.html
+├── property-tax-lookup.html
+├── stall-terms-and-conditions.html
+├── tenant-form.html
 ├── styles/             # CSS stylesheets
 │   ├── style.css
 │   ├── index.css
@@ -75,8 +74,8 @@ The server will start on **http://127.0.0.1:3001**
 
 ## Accessing the Application
 
-- **Main Website**: http://127.0.0.1:3001/pages/index.html
-- **Membership Form**: http://127.0.0.1:3001/pages/membership-form.html
+- **Main Website**: http://127.0.0.1:3001/index.html
+- **Membership Form**: http://127.0.0.1:3001/membership-form.html
 
 ## Membership Form Features
 
@@ -105,18 +104,18 @@ The membership form is accessible from the main website navigation:
 ## Development
 
 To modify the membership form:
-- Edit `pages/membership-form.html` for the standalone form
-- Edit `pages/index.html` for the main website integration
+- Edit `membership-form.html` for the standalone form
+- Edit `index.html` for the main website integration
 - The form uses React components with hooks for state management
 
 ### File Paths
 
-When referencing assets from HTML pages in the `pages/` directory:
-- CSS files: `../styles/filename.css`
-- Images: `../assets/images/filename.png`
-- Videos: `../assets/videos/filename.mp4`
-- Documents: `../assets/documents/filename`
-- Other pages: `./filename.html` (relative to pages directory)
+When referencing assets from HTML pages in the project root:
+- CSS files: `./styles/filename.css`
+- Images: `./assets/images/filename.png`
+- Videos: `./assets/videos/filename.mp4`
+- Documents: `./assets/documents/filename`
+- Other pages: `./filename.html`
 
 ## Notes
 
