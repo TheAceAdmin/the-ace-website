@@ -3,19 +3,16 @@ export default {
     const url = new URL(request.url);
     let pathname = url.pathname;
 
-    // Define redirects (200 = rewrite, URL stays the same)
-    const redirects = {
-      '/maintenance-calculator.html': '/pages/maintenance-calculator.html',
-      '/property-tax-lookup.html': '/pages/property-tax-lookup.html',
-      '/membership-form.html': '/pages/membership-form.html',
-      '/tenant-form.html': '/pages/tenant-form.html',
-      '/business-opportunities.html': '/pages/business-opportunities.html',
-      '/stall-terms-and-conditions.html': '/pages/stall-terms-and-conditions.html',
-    };
+    // Redirect first-level paths (other than root and existing /pages/*) to /pages/<segment>
+    if (pathname !== '/' && !pathname.startsWith('/pages/')) {
+      const segment = pathname.split('/')[1];
+      const hasNestedSegment = pathname.slice(1).includes('/');
 
-    // Apply redirect if exists
-    if (redirects[pathname]) {
-      pathname = redirects[pathname];
+      if (segment && !hasNestedSegment) {
+        const redirectUrl = new URL(url);
+        redirectUrl.pathname = `/pages/${segment}`;
+        return Response.redirect(redirectUrl.toString(), 301);
+      }
     }
 
     // Default to index.html for root
