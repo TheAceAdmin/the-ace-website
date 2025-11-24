@@ -14,6 +14,10 @@ the-ace-website/
 ├── maintenance-calculator.html
 ├── membership-form.html
 ├── property-tax-lookup.html
+├── membership-form-demo.mp4
+├── owner-enrollment-letout-mygate-demo.mp4
+├── owner-enrollment-mygate-demo.mp4
+├── tenant-form-demo.mp4
 ├── stall-terms-and-conditions.html
 ├── tenant-form.html
 ├── styles/             # CSS stylesheets
@@ -22,7 +26,6 @@ the-ace-website/
 │   └── 404.css
 ├── assets/             # Static assets
 │   ├── images/         # Image files (PNG, JPG, etc.)
-│   ├── videos/         # Video files (MP4)
 │   └── documents/      # PDFs and data files
 ├── scripts/            # JavaScript and script files
 │   ├── membership-form.jsx
@@ -113,7 +116,7 @@ To modify the membership form:
 When referencing assets from HTML pages in the project root:
 - CSS files: `./styles/filename.css`
 - Images: `./assets/images/filename.png`
-- Videos: `./assets/videos/filename.mp4`
+- Videos: `./filename.mp4`
 - Documents: `./assets/documents/filename`
 - Other pages: `./filename.html`
 
