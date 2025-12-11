@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EV Charging NOC Application Form - The ACE</title>
+    <style>
+        :root {
+            color-scheme: light;
+            font-size: 15px;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #f1f5f9;
+            font-family: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+            color: #111827;
+            line-height: 1.5;
+        }
+
+        .page {
+            position: relative;
+            width: 210mm;
+            min-height: 297mm;
+            margin: 24px auto;
+            padding: 32px 36px 36px;
+            background: #ffffff;
+            box-shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
+            border-radius: 18px;
+        }
+
+        .print-button {
+            position: absolute;
+            top: 28px;
+            right: 44px;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 999px;
+            background: #0f172a;
+            color: #ffffff;
+            font-weight: 600;
+            cursor: pointer;
+            letter-spacing: 0.02em;
+            transition: background 0.2s ease, transform 0.2s ease;
+        }
+
+        .print-button:hover {
+            background: #1e293b;
+            transform: translateY(-1px);
+        }
+
+        .association-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 24px;
+        }
+
+        .association-header img {
+            width: 76px;
+            height: 76px;
+            object-fit: contain;
+        }
+
+        .association-header h1 {
+            margin: 0;
+            font-size: 1.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #0f172a;
+        }
+
+        .association-header p {
+            margin: 4px 0 0;
+            font-size: 0.9rem;
+            color: #475569;
+        }
+
+        .document-heading {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .document-heading h2 {
+            margin: 0;
+            font-size: 1.4rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #0f172a;
+        }
+
+        .document-heading .doc-subtitle {
+            margin: 8px 0 4px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1e3a8a;
+        }
+
+        .document-heading .doc-to {
+            margin: 0;
+            font-size: 0.95rem;
+            color: #334155;
+            font-style: italic;
+        }
+
+        .address-block {
+            margin-bottom: 18px;
+            font-size: 0.95rem;
+            color: #1f2937;
+            line-height: 1.6;
+        }
+
+        .address-block .label {
+            font-weight: 600;
+            display: block;
+        }
+
+        .purpose-box {
+            padding: 20px 22px;
+            border: 1px solid #cbd5f5;
+            border-radius: 14px;
+            background: #f8fafc;
+            color: #1f2937;
+            font-size: 0.96rem;
+            margin-bottom: 22px;
+        }
+
+        .section {
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .section:last-of-type {
+            border-bottom: none;
+        }
+
+        .page-break-after {
+            /* ensures specificity if needed for screen adjustments */
+        }
+
+        .section-title {
+            margin: 0 0 14px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #0f172a;
+        }
+
+        .field-group {
+            display: grid;
+            gap: 18px 26px;
+        }
+
+        .field-row {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            min-height: 48px;
+        }
+
+        .field-label {
+            flex: 0 0 280px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .line {
+            flex: 1;
+            min-height: 40px;
+            border-bottom: 1.5px solid #334155;
+        }
+
+        .line.short {
+            flex: 0 0 220px;
+        }
+
+        .checkbox-options,
+        .acknowledgement-list,
+        .committee-options {
+            display: grid;
+            gap: 10px;
+        }
+
+        .option-line {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 0.96rem;
+            color: #1f2937;
+        }
+
+        .checkbox-box {
+            display: inline-flex;
+            width: 18px;
+            height: 18px;
+            border: 1.5px solid #1f2937;
+            border-radius: 3px;
+            flex-shrink: 0;
+        }
+
+        .bullet-list {
+            margin: 0;
+            padding-left: 24px;
+            display: grid;
+            gap: 10px;
+            font-size: 0.96rem;
+            color: #1f2937;
+        }
+
+        .noc-page {
+            position: relative;
+            padding: 22px 32px 16px;
+            display: block !important;
+        }
+
+        .noc-heading {
+            text-align: center;
+            margin-bottom: 8px;
+        }
+
+        .noc-heading h2 {
+            margin: 0;
+            font-size: 1.12rem;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: #0f172a;
+        }
+
+        .noc-meta {
+            margin-bottom: 12px;
+            display: grid;
+            gap: 6px;
+            width: 100%;
+        }
+
+        .noc-body {
+            font-size: 0.88rem;
+            color: #1f2937;
+            display: grid;
+            gap: 4px;
+            text-align: justify;
+            width: 100%;
+        }
+
+        .noc-body p {
+            margin: 0;
+        }
+
+        .noc-section-title {
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: #0f172a;
+            margin-bottom: 4px;
+        }
+
+        .noc-closing {
+            margin-top: 4px;
+            display: grid;
+            gap: 4px;
+            width: 100%;
+        }
+
+        .noc-page .field-row {
+            min-height: 28px;
+            gap: 8px;
+        }
+
+        .noc-page .line {
+            min-height: 24px;
+        }
+
+        .noc-page header,
+        .noc-page .noc-heading,
+        .noc-page .noc-meta,
+        .noc-page .noc-body,
+        .noc-page .noc-closing {
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .noc-page .signature-grid {
+            justify-items: start;
+        }
+
+        .declaration {
+            font-size: 0.96rem;
+            color: #1f2937;
+            margin-bottom: 16px;
+        }
+
+        .signature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px 32px;
+            width: 100%;
+        }
+
+        .signature-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .signature-label {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .signature-line {
+            min-height: 40px;
+            border-bottom: 1.5px solid #334155;
+        }
+
+        .noc-signature-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 18px 32px;
+            width: 100%;
+        }
+
+        .noc-signature-grid .signature-field {
+            flex: 1;
+        }
+
+        .remarks-box {
+            border: 1.5px solid #334155;
+            border-radius: 12px;
+            min-height: 110px;
+        }
+
+        footer {
+            margin-top: 36px;
+            text-align: center;
+            font-size: 0.88rem;
+            color: #64748b;
+        }
+
+        @media print {
+            body {
+                background: #ffffff;
+            }
+
+            .page {
+                width: auto;
+                min-height: auto;
+                margin: 0;
+                padding: 18mm 16mm 16mm;
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            .print-button {
+                display: none;
+            }
+
+            @page {
+                size: A4;
+                margin: 14mm 12mm 10mm;
+            }
+
+            .page-break-after {
+                break-after: page;
+                page-break-after: always;
+            }
+
+            .noc-page {
+                break-before: page;
+                page-break-before: always;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="page page-break-after">
+        <header class="association-header" style="display: flex; align-items: center; justify-content: center;">
+            <img src="../assets/images/taaowa-logo.jpeg" alt="TAAOWA logo" style="align-self: center;">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <h2 style="margin: 0; white-space: nowrap; text-align: center;">THE ACE APARTMENT OWNERS WELFARE
+                    ASSOCIATION</h2>
+                <p style="margin: 4px 0 0; white-space: nowrap; text-align: center;">(Reg. No.Chennai South/175/2025.
+                    Under TN Apartment Ownership Act 2022)</p>
+            </div>
+        </header>
+
+        <div class="document-heading">
+            <h2>EV Charging NOC Application Form</h2>
+        </div>
+
+        <section class="address-block">
+            <span class="label">To,</span>
+            <span class="label">The President / Secretary</span>
+            <div>The ACE Apartment Owners Welfare Association</div>
+            <div>The ACE, No.1, Corporation Road, Perungudi, Chennai, Tamil Nadu 600096</div>
+        </section>
+
+        <section class="purpose-box">
+            <strong>Purpose:</strong> This form is submitted by the resident requesting a No Objection Certificate (NOC)
+            for installing an
+            Electric Vehicle (EV) charging point within the allocated parking space.
+        </section>
+
+        <section class="section">
+            <h3 class="section-title">1. Resident Details</h3>
+            <div class="field-group">
+                <div class="field-row">
+                    <span class="field-label">Name:</span>
+                    <span class="line"></span>
+                </div>
+                <div class="field-row">
+                    <span class="field-label">Flat No.:</span>
+                    <span class="line"></span>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h3 class="section-title">2. Parking &amp; Vehicle Details</h3>
+            <div class="field-group">
+                <div class="field-row">
+                    <span class="field-label">Allocated Covered/Basement Parking Number:</span>
+                    <span class="line"></span>
+                </div>
+                <div class="field-row">
+                    <span class="field-label">EV Charger Specification:</span>
+                    <span class="line"></span>
+                </div>
+                <div class="field-row">
+                    <span class="field-label">Vehicle Make &amp; Model:</span>
+                    <span class="line"></span>
+                </div>
+                <div class="field-row">
+                    <span class="field-label">Vehicle Registration Number:</span>
+                    <span class="line"></span>
+                </div>
+            </div>
+        </section>
+
+        <section class="section">
+            <h3 class="section-title">3. Installation Details</h3>
+            <div class="field-group" style="margin-bottom: 12px;">
+                <div class="field-row">
+                    <span class="field-label">Installation done by:</span>
+                    <span class="line"></span>
+                </div>
+            </div>
+            <div class="field-row" style="margin-top: 12px;">
+                <span class="field-label">Charger  include MCB and RCB/RCBO:</span>
+                <span class="line"></span>
+            </div>
+        </section>
+
+        <section class="section">
+            <h3 class="section-title">4. Safety &amp; Compliance Acknowledgements</h3>
+            <ul class="bullet-list">
+                <li>Power will be drawn from the flat owner's TNEB meter.</li>
+                <li>This charging point will not be used for any commercial activities.</li>
+                <li>The charging point will not obstruct movement or create any safety hazards.</li>
+                <li>No structural modifications will be done without prior approval.</li>
+                <li>Any maintenance issues will be immediately reported to TAAOWA.</li>
+                <li>Energy consumption will be billed as per association policy.</li>
+                <li>Resident will follow all SOPs, rules, safety norms, and EV Charger instructions specified by TAAOWA.
+                <li>Any liability arising from a malfunction of the EV charging unit that affects other residents
+                    rests solely with the owner of the charging unit/vehicle.</li>
+                </li>
+            </ul>
+        </section>
+
+        <section class="section">
+            <h3 class="section-title">5. Ownership &amp; Resident Declaration</h3>
+            </br>
+            <p class="declaration">
+                I, ________________________, take full ownership of the charger installed in my parking space and
+                confirm that the same
+                will be used only for my personal use.
+            </p>
+            <p class="declaration">
+                I will follow all the safety norms and the instructions specified in the EV Charger SOP shared by
+                TAAOWA.
+            </p>
+            <p class="declaration">
+                I hereby request approval/NOC from TAAOWA for installing the EV charging point at my allocated parking
+                area. All information
+                provided is accurate to the best of my knowledge.
+            </p>
+
+            <div class="signature-grid">
+                <div class="signature-field">
+                    <span class="signature-label">Date:</span>
+                    <span class="signature-line"></span>
+                </div>
+                <div class="signature-field">
+                    <span class="signature-label">Signature:</span>
+                    <span class="signature-line"></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Committee review section removed per latest requirements -->
+    </div>
+
+    <div class="page noc-page">
+        <header class="association-header" style="display: flex; align-items: center; justify-content: center;">
+            <img src="../assets/images/taaowa-logo.jpeg" alt="TAAOWA logo" style="align-self: center;">
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                <h2 style="margin: 0; white-space: nowrap; text-align: center;">THE ACE APARTMENT OWNERS WELFARE
+                    ASSOCIATION</h2>
+                <p style="margin: 4px 0 0; white-space: nowrap; text-align: center;">(Reg. No.Chennai South/175/2025.
+                    Under TN Apartment Ownership Act 2022)</p>
+            </div>
+        </header>
+
+        <div class="noc-heading" style="margin-bottom: 10px;">
+            <h2>No Objection Certificate (NOC) – EV Charging Installation</h2>
+        </div>
+
+        <div class="noc-meta">
+            <div>To,</div>
+            <div class="field-row">
+                <span class="line"></span>
+            </div>
+        </div>
+        <div class="noc-body">
+            <section class="purpose-box">
+                <strong>Subject:</strong> Approval of NOC for EV Charging
+                Point Installation
+            </section>
+            <p>Dear Resident,</p>
+            <p>
+                We acknowledge the receipt of your application requesting permission to install an Electric Vehicle (EV)
+                charging point at
+                your allocated parking space.
+            </p>
+            <p>
+                After reviewing the details submitted and verifying compliance with the safety and installation
+                guidelines, TAAOWA hereby
+                grants you the No Objection Certificate (NOC) to proceed with the installation of the EV charging point
+                in your designated
+                parking area.
+            </p> 
+            <div>
+                <div class="noc-section-title">Approval Conditions</div>
+                <ul class="bullet-list" style="margin-top: 0; gap: 4px; line-height: 1.35;">
+                    <li>Power will be drawn from your flat’s TNEB meter.</li>
+                    <li>The charger will not be used for any commercial activity.</li>
+                    <li>The installation will adhere strictly to the EV Charger SOP and safety standards specified by
+                        TAAOWA.</li>
+                    <li>No structural modifications will be made without prior approval.</li>
+                    <li>The charging unit will not obstruct movement or create safety hazards.</li>
+                    <li>Any maintenance issues will be reported promptly to TAAOWA.</li>
+                    <li>Resident takes full responsibility for the installed charger and its usage and any liabilities.
+                    </li>
+                </ul>
+            </div> </br>
+            <div>
+                <div class="noc-section-title">Important Note</div>
+                <p>
+                    This NOC is valid only for the EV vehicle with number ________________________ in your application and does not permit any
+                    alterations without
+                    further approval from the association.
+                </p>
+            </div>
+        </div>
+        </br>
+        <div class="noc-closing">
+            <p style="margin: 0;"><b>Warm regards,</p>
+            <p style="margin: 0;">For The ACE Apartment Owners Welfare Association (TAAOWA)</b></p>
+            <div class="noc-signature-grid">
+                <div class="signature-field">
+                    <span class="signature-label">Name:</span>
+                    <span class="signature-line"></span>
+                </div>
+                <div class="signature-field">
+                    <span class="signature-label">Designation:</span>
+                    <span class="signature-line"></span>
+                </div>
+                <div class="signature-field">
+                    <span class="signature-label">Signature &amp; Seal:</span>
+                    <span class="signature-line"></span>
+                </div>
+                <div class="signature-field">
+                    <span class="signature-label">Date:</span>
+                    <span class="signature-line"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const printButton = document.getElementById("printButton");
+        if (printButton) {
+            printButton.addEventListener("click", () => window.print());
+        }
+    </script>
+</body>
+
+</html>
